@@ -11,8 +11,9 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/assets/js/app.js', 'public/js')
-   .sass('resources/assets/sass/app.scss', 'public/css')
+mix.js(	'resources/assets/js/app.js','public/js').sourceMaps();
+mix.js('resources/assets/js/login_app.js','public/js').sourceMaps();
+mix.sass('resources/assets/sass/app.scss', 'public/css')
    .browserSync({
-   	
+   		proxy: 'myhg.local'
    });
