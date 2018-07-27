@@ -18,12 +18,21 @@ window.Vue = require('vue');
 
 const app = new Vue({
     el: '#app',
+    data:{
+    	user:{
+    		username: null,
+    		password: null
+    	}
+    },
     mounted(){
     	$('body').foundation();    	
+    	axios.get('/api/user').then(response => {
+	        console.log(response.data);
+	    });
     },
     methods:{
     	onSubmit(){
-	    	console.log('hellow')
+	    	console.log('submit is called')
 	    }	
     }
     

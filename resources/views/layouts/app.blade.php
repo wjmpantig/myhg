@@ -12,9 +12,12 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
     </head>
     <body >
+       <div id="app" class="grid-container">
+        @yield('content')    
+       </div>
        
-      
-        <script src="js/app.js"></script>
+       
+       @yield('scripts')
      
     </body>
 </html>
