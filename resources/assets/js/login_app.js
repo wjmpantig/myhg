@@ -26,13 +26,16 @@ const app = new Vue({
     },
     mounted(){
     	$('body').foundation();    	
-    	axios.get('/api/user').then(response => {
-	        console.log(response.data);
-	    });
     },
     methods:{
     	onSubmit(){
-	    	console.log('submit is called')
+
+	    	// console.log(this.user)
+	    	// axios.post('/login',this.user).then(response=>{
+	    	// 	console.log(response);
+	    	// }).catch(err=>{
+	    	// 	console.error(err);
+	    	// });
 	    }	
     }
     

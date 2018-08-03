@@ -11,8 +11,11 @@ class UserTypesTableSeeder extends Seeder
      */
     public function run()
     {
-        $admin = new UserType();
-        $admin->name= "Administrator";
-        $admin->save();
+    	$names = ['Administrator','Teacher','Student'];
+    	foreach($names as $name){
+    		$type = new UserType();
+    		$type->name = $name;
+    		$type->save();
+    	}
     }
 }

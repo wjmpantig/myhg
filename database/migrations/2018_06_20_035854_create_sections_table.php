@@ -16,8 +16,10 @@ class CreateSectionsTable extends Migration
         Schema::create('sections', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name',100);
+            $table->unsignedInteger('season_id');
             $table->timestamps();
             $table->softDeletes();
+            $table->foreign('season_id')->references('id')->on('seasons');
         });
     }
 
