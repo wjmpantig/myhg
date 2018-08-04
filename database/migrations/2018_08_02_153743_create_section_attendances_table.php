@@ -20,6 +20,8 @@ class CreateSectionAttendancesTable extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('section_id')->references('id')->on('sections');
+            $table->unique(['section_id','date']);
+
         });
     }
 

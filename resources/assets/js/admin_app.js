@@ -16,10 +16,15 @@ require('./bootstrap');
 window.Vue = require('vue');
 import VuejsDialog from 'vuejs-dialog';
 import VueRouter from 'vue-router';
+import Datepicker from 'vuejs-datepicker';
+
 window.VueResource = require('vue-resource');
-Vue.component('font-awesome-icon', FontAwesomeIcon)
+Vue.component('font-awesome-icon', FontAwesomeIcon);
+Vue.component('datepicker',Datepicker);
 Vue.use(VueRouter);
 Vue.use(VuejsDialog);
+Vue.use(require('vue-moment'));
+
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -30,7 +35,17 @@ import { routes } from './admin_routes.js';
 
 const router = new VueRouter({
 	base: '/admin',
-	routes
+	routes,
+	linkActiveClass: 'active'
 });
 
-const app = new Vue({router}).$mount('#app');
+const app = new Vue({
+	router,
+	methods:{
+		logout(){
+			$('#logout-form').submit()
+			
+		}
+	},
+	
+}).$mount('#app');

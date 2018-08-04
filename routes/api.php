@@ -25,4 +25,7 @@ Route::middleware('auth:api')->group(function(){
 	Route::get('sections/{id}','SectionsController@get');
 	Route::post('sections/{id}','SectionsController@update');
 	Route::delete('sections/{id}','SectionsController@delete');
+
+	Route::get('sections/{id}/students','SectionsController@students');
+	Route::get('sections/{id}/attendance','SectionsController@attendance');
 });

@@ -15,12 +15,14 @@ class CreateStudentAttendancesTable extends Migration
     {
         Schema::create('student_attendances', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('section_attendances_id');
+            $table->unsignedBigInteger('section_attendance_id');
             $table->unsignedBigInteger('student_id');
             $table->boolean('is_present');
             $table->timestamps();
-            $table->foreign('section_attendances_id')->references('id')->on('section_attendances');
+            $table->foreign('section_attendance_id')->references('id')->on('section_attendances');
             $table->foreign('student_id')->references('id')->on('users');
+            $table->unique(['section_attendance_id','student_id']);
+            
         });
     }
 

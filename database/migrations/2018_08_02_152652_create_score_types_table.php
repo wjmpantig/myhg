@@ -14,7 +14,7 @@ class CreateScoreTypesTable extends Migration
     public function up()
     {
         Schema::create('score_types', function (Blueprint $table) {
-            $table->increments('id');
+            $table->tinyIncrements('id');
             $table->string('name');
             $table->timestamps();
         });

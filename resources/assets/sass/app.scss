@@ -10,10 +10,15 @@
 @include foundation-everything(true,false);
 
 #sidebar{
-	background: $primary-color;
+	// background: $secondary-color;
 	.menu a{
-		color: $white;
+		// color: $white;
 	}
+}
+
+.tabs-title.is-active a{
+	background: $tab-background-active;
+    color: $tab-active-color;
 }
 
 a.alert,span.alert-message{

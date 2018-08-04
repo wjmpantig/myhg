@@ -8928,12 +8928,9 @@ a.thumbnail image {
   }
 }
 
-#sidebar {
-  background: #1779ba;
-}
-
-#sidebar .menu a {
-  color: #fefefe;
+.tabs-title.is-active a {
+  background: #e6e6e6;
+  color: #1779ba;
 }
 
 a.alert,

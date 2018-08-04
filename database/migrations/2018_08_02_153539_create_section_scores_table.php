@@ -15,12 +15,12 @@ class CreateSectionScoresTable extends Migration
     {
         Schema::create('section_scores', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('score_type_id');
+            $table->unsignedTinyInteger('score_type_id');
             $table->unsignedBigInteger('section_id');
             $table->unsignedDecimal('total',4,2);
             $table->timestamps();
             $table->softDeletes();
-            $table->foreign('score_type_id')->references('id')->on('score_type');
+            $table->foreign('score_type_id')->references('id')->on('score_types');
             $table->foreign('section_id')->references('id')->on('sections');
         });
     }

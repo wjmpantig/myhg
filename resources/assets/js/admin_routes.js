@@ -7,15 +7,19 @@ module.exports={
 	},
 	{
 		path: '/sections',
-		component: require('./components/admin/Sections.vue')
+		component: require('./components/admin/sections/Sections.vue')
 	},
 	{
 		path: '/sections/:id',
-		component: require('./components/admin/Section.vue'),
+		component: require('./components/admin/sections/Section.vue'),
 		children:[
 			{
-				path:'students',
+				path:'',
 				component: require('./components/admin/sections/students.vue')
+			},
+			{
+				path:'attendance',
+				component: require('./components/admin/sections/Attendance.vue')
 			}
 		]
 	},

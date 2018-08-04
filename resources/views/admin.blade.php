@@ -15,12 +15,12 @@
     <div class="grid-x grid-padding-x grid-padding-y">
         <div class="cell show-for-large large-3" id="sidebar">
             <ul class="menu vertical">
-                <li><router-link to="/">Dashboard</router-link></li>
-                <li><router-link to="/sections">Sections</router-link></li>
-                <li><router-link to="/teachers">Teachers</router-link></li>
-                <li><router-link to="/students">Students</router-link></li>
-                <li><a href="javascript:$('#logout-form').submit()">Logout</a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                <router-link tag="li" to="/" exact><a>Dashboard</a></router-link>
+                <router-link tag="li" to="/sections"><a>Sections</a></router-link>
+                <router-link tag="li" to="/teachers"><a>Teachers</a></router-link>
+                <router-link tag="li" to="/students"><a>Students</a></router-link>
+                <li><a href="#" @click="logout()">Logout</a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hide">
                     @csrf
                 </form>
                 </li>
