@@ -28,4 +28,11 @@ Route::middleware('auth:api')->group(function(){
 
 	Route::get('sections/{id}/students','SectionsController@students');
 	Route::get('sections/{id}/attendance','SectionsController@attendance');
+	Route::post('sections/{id}/attendance','SectionsController@updateAttendance');
+	Route::put('sections/{id}/attendance','SectionsController@addAttendance');
+	Route::delete('sections/{id}/attendance/{section_attendance_id}','SectionsController@deleteAttendance');
+
+
+	Route::get('score_types/{id}','ScoresController@score_types');
+	Route::get('sections/{id}/scores/{type_id}','ScoresController@scores');
 });

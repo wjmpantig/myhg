@@ -20,6 +20,27 @@ module.exports={
 			{
 				path:'attendance',
 				component: require('./components/admin/sections/Attendance.vue')
+			},
+			{
+				path:'homeworks',
+				component: require('./components/admin/sections/Scores.vue'),
+				meta:{
+					type_id: 1
+				}
+			},
+			{
+				path:'quizzes',
+				component: require('./components/admin/sections/Scores.vue'),
+				meta:{
+					type_id: 2
+				}
+			},
+			{
+				path:'finals',
+				component: require('./components/admin/sections/Scores.vue'),
+				meta:{
+					type_id: 3
+				}
 			}
 		]
 	},

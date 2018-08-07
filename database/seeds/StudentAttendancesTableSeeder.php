@@ -25,22 +25,19 @@ class StudentAttendancesTableSeeder extends Seeder
         	$section_id = $value->section_id;
         	
         	$students = SectionStudent::where('section_id',$section_id)->get();
-        	foreach ($students as $key => $value) {
-        		$student_id = $value->student_id;
+        	foreach ($students as $key => $student) {
         		// $this->command->info("\t\t" .$student_id);
         		$hasEntry = $faker->boolean(80);
-        		$hasEntry = true;
+        		// $hasEntry = true;
         		if($hasEntry){
         			$attendance = new StudentAttendance();
         			$attendance->section_attendance_id=$attendance_id;
-        			$attendance->student_id = $student_id;
+        			$attendance->student_id = $student->id;
         			$attendance->is_present= $faker->boolean(50);
         			$attendance->save();
         		}
         	}
-        	if($key == 2){
-        		break;
-        	}
+        	
         }
     }
 }

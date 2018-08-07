@@ -6,9 +6,11 @@
  */
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-regular-svg-icons/faEdit';
+import {faBars} from '@fortawesome/free-solid-svg-icons/faBars';
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import {faTrashAlt} from '@fortawesome/free-regular-svg-icons/faTrashAlt';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faEdit,faTrashAlt);
+library.add(faEdit,faTrashAlt,faBars,faTimes);
 
 
 require('./bootstrap');
@@ -41,6 +43,9 @@ const router = new VueRouter({
 
 const app = new Vue({
 	router,
+	mounted(){
+		$('body').foundation();
+	},
 	methods:{
 		logout(){
 			$('#logout-form').submit()

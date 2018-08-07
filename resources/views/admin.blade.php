@@ -9,22 +9,23 @@
         </ul>
 
     </div>
+    <div class="top-bar-right hide-for-large">
+        <ul class="menu dropdown" data-dropdown-menu>
+            <li>
+                <a href="#"><font-awesome-icon :icon="['fas','bars']"></font-awesome-icon></a>
+                @include('admin.menu')   
+            </li>
+           
+        </ul>
+        
+
+    </div>
 </div>
 
-<div class="grid-container">
+<div class="grid-container fluid">
     <div class="grid-x grid-padding-x grid-padding-y">
         <div class="cell show-for-large large-3" id="sidebar">
-            <ul class="menu vertical">
-                <router-link tag="li" to="/" exact><a>Dashboard</a></router-link>
-                <router-link tag="li" to="/sections"><a>Sections</a></router-link>
-                <router-link tag="li" to="/teachers"><a>Teachers</a></router-link>
-                <router-link tag="li" to="/students"><a>Students</a></router-link>
-                <li><a href="#" @click="logout()">Logout</a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hide">
-                    @csrf
-                </form>
-                </li>
-            </ul>
+           @include('admin.menu');
         </div>
         <div class="cell large-9">
             <router-view></router-view>

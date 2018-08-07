@@ -1,15 +1,20 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use App\Section;
 use App\SectionAttendance;
 use App\StudentAttendance;
 use App\Season;
+use App\ScoreType;
+use App\SectionScore;
 use App\User;
 use App\UserType;
 use DB;
+use Carbon\Carbon;
+use Log;
 class SectionsController extends Controller
 {
     public function __construct()
@@ -25,7 +30,7 @@ class SectionsController extends Controller
 
     public function update(Request $request){
     	$request->validate([
-    		'id'=>'exists:sections,id',
+    		'id'=>'required|exists:sections,id',
     		'name'=>'required|max:20'
     	]);
     	$section = Section::findOrFail($request->id);
@@ -36,7 +41,7 @@ class SectionsController extends Controller
 
     public function delete(Request $request){
     	$request->validate([
-    		'id'=>'exists:sections,id'
+    		'id'=>'required|exists:sections,id'
     	]);
     	$section = Section::findOrFail($request->id);
     	$section->delete();
@@ -73,22 +78,117 @@ class SectionsController extends Controller
     	]);
     	
     	
-    	$dates = SectionAttendance::with('attendance')
-			->where('section_id',$request->id)
+    	$dates = SectionAttendance::where('section_id',$request->id)
+			->orderBy('date')
 			->get();
-		$date_ids = array_pluck($dates,'id');
-		$students = DB::table('users')
-    		->rightJoin('section_students','student_id','=','users.id')
+		
+		$raw = "(select group_concat( section_attendances.id separator ',') from student_attendances 
+			join section_attendances on section_attendances.id = student_attendances.section_attendance_id
+			where student_attendances.student_id = users.id and is_present = 1 and section_attendances.deleted_at is null
+			group by student_id
+			order by date) as attendance
+		";
+
+		$students = DB::table('section_students')
+			->select('users.id as id','first_name','last_name',
+				DB::raw($raw)
+			)
+    		->leftJoin('users','student_id','=','users.id')
+    		->leftJoin('sections','sections.id','=','users.id')
     		->where('section_id',$request->id)
+    		->whereNull('users.deleted_at')
+    		->whereNull('sections.deleted_at')
     		->orderBy('last_name')
     		->get();
-    	$student_ids = array_pluck($students,'id');
-    	$attendance = StudentAttendance::whereIn('student_id',$student_ids)->get();
+    	foreach($students as $student){
+    		$student->attendance = array_fill_keys(array_map('intval', explode(',', $student->attendance)),true);
+    	}
+    
     	$data = new \stdClass();
     	$data->dates = $dates;
     	$data->students = $students;
-    	$data->attendance = $attendance;
+    	
     	// $data->ids = $date_ids;
     	return response()->json($data);
     }
+
+    public function updateAttendance(Request $request){
+    	$request->validate([
+    		'id'=>'required|exists:sections,id',
+    		'section_attendance_id'=>'required|exists:section_attendances,id',
+    		'student_id' =>'required|exists:users,id',
+    		'value'=>'required|required|boolean'
+    	]);
+    	
+    	$attendance = StudentAttendance::where('student_id',$request->student_id)
+    	->where('section_attendance_id',$request->id)
+    	->first();
+    	if($attendance){
+    		if($request->value){
+    			$attendance->is_present = $request->value;
+    			$attendance->save();
+    			return $attendance;
+    		}
+    		$attendance->delete();
+    		return "record deleted";
+    		
+    	}
+    	if($request->value){
+	    	$attendance = new StudentAttendance();
+	    	$attendance->student_id = $request->student_id;
+	    	$attendance->section_attendance_id=$request->id;
+	    	$attendance->is_present = $request->value;
+	    	$attendance->save();
+	    	return $attendance;
+	    }
+
+    	return 'no update needed';
+    }
+
+    public function deleteAttendance(Request $request){
+    	$request->validate([
+    		'id'=>'exists:sections,id',
+    		'section_attendance_id'=>'exists:section_attendances,id'
+    	]);
+    	// return $request->section_attendance_id;
+    	$attendance = SectionAttendance::findOrFail($request->section_attendance_id);
+    	$attendance->delete();
+    	return "attendance deleted";
+    }
+
+    public function addAttendance(Request $request){
+    	$messages = [
+    		'date.unique'=> 'Date already exists for that section'
+    	];
+    	$section_id = $request->id;
+    	$date = $request->date;
+    	$date = Carbon::parse($date)->format('Y-m-d');
+    	// return $date;
+    	
+    	$request->validate(
+    		[
+				'id'=>'exists:sections,id',
+				'date' => [
+					'required',
+					'date_format:Y-m-d',
+					Rule::unique('section_attendances')->where(function($query) use($date,$section_id){
+						return $query->where('date',$date)
+							->where('section_id',$section_id)
+							->whereNull('deleted_at');
+					})
+				]
+    		]
+    	);
+
+    	$attendance = new SectionAttendance();
+    	$attendance->section_id = $section_id;
+    	$attendance->date = $date;
+    	$attendance->save();
+    	
+    	
+
+    	return $attendance;
+    }
+
+    
 }

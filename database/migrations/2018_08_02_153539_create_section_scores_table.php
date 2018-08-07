@@ -17,7 +17,8 @@ class CreateSectionScoresTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedTinyInteger('score_type_id');
             $table->unsignedBigInteger('section_id');
-            $table->unsignedDecimal('total',4,2);
+            $table->unsignedDecimal('total',6,2);
+            $table->date('date');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('score_type_id')->references('id')->on('score_types');

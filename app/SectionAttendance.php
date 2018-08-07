@@ -3,9 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SectionAttendance extends Model
 {
+	use SoftDeletes;
     protected $dates = [
         'created_at',
         'updated_at',
@@ -20,5 +22,7 @@ class SectionAttendance extends Model
     public function section(){
     	return $this->belongsTo('App\Section');
     }
+
+    
 
 }

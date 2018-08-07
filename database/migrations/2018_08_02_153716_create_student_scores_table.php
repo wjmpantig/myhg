@@ -15,9 +15,9 @@ class CreateStudentScoresTable extends Migration
     {
         Schema::create('student_scores', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('section_scores_id');
+            $table->unsignedBigInteger('section_score_id');
             $table->unsignedBigInteger('student_id');
-            $table->unsignedDecimal('score',4,2);
+            $table->unsignedDecimal('score',6,2);
             $table->timestamps();
             $table->foreign('section_scores_id')->references('id')->on('section_scores');
             $table->foreign('student_id')->references('id')->on('users');
