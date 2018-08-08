@@ -32,7 +32,7 @@ class StudentAttendancesTableSeeder extends Seeder
         		if($hasEntry){
         			$attendance = new StudentAttendance();
         			$attendance->section_attendance_id=$attendance_id;
-        			$attendance->student_id = $student->id;
+        			$attendance->student_id = $student->student_id;
         			$attendance->is_present= $faker->boolean(50);
         			$attendance->save();
         		}

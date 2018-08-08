@@ -14,4 +14,11 @@ class SectionStudent extends Model
         'updated_at',
         'deleted_at'
     ];
+
+   	public function section(){
+   		return $this->belongsTo('App\Section');
+   	}
+   	public function student(){
+   		return $this->belongsTo('App\Student');
+   	}
 }

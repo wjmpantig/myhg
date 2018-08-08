@@ -19,7 +19,7 @@ class CreateSectionStudentsTable extends Migration
             $table->unsignedBigInteger('student_id');
             $table->timestamps();
             $table->softDeletes();
-            $table->unique(['section_id','student_id']);
+            
         });
     }
 

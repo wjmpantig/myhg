@@ -76,4 +76,11 @@ class ScoresController extends Controller
     	// $data->ids = $date_ids;
     	return response()->json($data);
     }
+
+    public function updateStudentScore(Request $request){
+
+    }
+    public function updateScore(Request $request){
+
+    }
 }

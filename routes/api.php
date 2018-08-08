@@ -35,4 +35,7 @@ Route::middleware('auth:api')->group(function(){
 
 	Route::get('score_types/{id}','ScoresController@score_types');
 	Route::get('sections/{id}/scores/{type_id}','ScoresController@scores');
+	Route::post('sections/{id}/scores/{type_id}/{score_id}','ScoresController@updateScore');
+	Route::post('sections/{id}/scores/{type_id}/{score_id}/{student_id}','ScoresController@updateStudentScore');
+
 });
