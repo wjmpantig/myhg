@@ -1,33 +1,41 @@
 <template>
 	<div>
-		<h3>Attendance</h3>
-		<span class="label alert" v-show="new_date.error">
-			{{new_date_error}}
-		</span>
-		<div class="input-group">
-			<span class="input-group-label">New date</span>
-			<datepicker placeholder="Date" input-class="input-group-field" v-model="new_date.date"></datepicker>
-			<div class="input-group-button">
-				<button class="button primary" @click="addAttendance">Add date</button>
+		<form @submit.prevent="addAttendance">
+			<div class="field has-addons">
+				<div class="control has-icons-left">
+					<datepicker placeholder="New date" v-bind:input-class="{'input':true,'is-danger': new_date.error}" v-model="new_date.date"></datepicker>
+					<span class="icon is-left">
+						<font-awesome-icon :icon="['far','calendar-alt']"></font-awesome-icon>
+					</span>
+				</div>
+				
+				<div class="control">
+					<button type="submit" class="button is-primary is-outlined">Add date</button>
+				</div>
 			</div>
-		</div>
-			<div class="table-scroll">
-				<table class="hover">				
+			
+		</form>
+		
+		<p class="help is-danger" v-show="new_date.error">
+			{{new_date_error}}
+		</p>
+			<div class="table-wrapper">
+				<table class="table is-hoverable is-bordered is-striped is-fullwidth">				
 					<thead>
 						<tr>
-							<td>Name</td>
-							<td v-for="(date,index) in dates" class="text-center">
+							<th>Name</th>
+							<th v-for="(date,index) in dates" class="has-text-centered">
 								<div>{{date.date | moment("MM/DD")}}</div>
-								<a @click="confirmDelete(date)" class="alert">
+								<a @click="confirmDelete(date)" class="has-text-danger">
 									<font-awesome-icon :icon="['fas','times']"></font-awesome-icon>
 								</a>
-							</td>
+							</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="(student,index) in students">
 							<td>{{ student.last_name}}, {{ student.first_name}}</td>
-							<td v-for="(date,index) in dates" class="text-center">
+							<td v-for="(date,index) in dates" class="has-text-centered">
 								<input type="checkbox" v-model="student.attendance[date.id]" v-on:change="togglePresent(student.id,date.id,student.attendance[date.id])">
 							</td>
 						</tr>
@@ -48,6 +56,7 @@ export default{
 				date: null,
 				error: null
 			},
+			test:'input'
 		}
 	},
 	mounted(){

@@ -9,8 +9,10 @@ import {faEdit} from '@fortawesome/free-regular-svg-icons/faEdit';
 import {faBars} from '@fortawesome/free-solid-svg-icons/faBars';
 import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import {faTrashAlt} from '@fortawesome/free-regular-svg-icons/faTrashAlt';
+import {faCalendarAlt} from '@fortawesome/free-regular-svg-icons/faCalendarAlt';
+import {faFileExport} from '@fortawesome/free-solid-svg-icons/faFileExport';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faEdit,faTrashAlt,faBars,faTimes);
+library.add(faEdit,faTrashAlt,faBars,faTimes,faFileExport,faCalendarAlt);
 
 
 require('./bootstrap');
@@ -38,7 +40,7 @@ import { routes } from './admin_routes.js';
 const router = new VueRouter({
 	base: '/admin',
 	routes,
-	linkActiveClass: 'active'
+	linkActiveClass: 'is-active'
 });
 
 const app = new Vue({

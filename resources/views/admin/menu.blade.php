@@ -1,12 +1,14 @@
- <ul class="menu vertical">
-    <router-link tag="li" to="/" exact><a>Dashboard</a></router-link>
-    <router-link tag="li" to="/sections"><a>Sections</a></router-link>
-    <!-- <router-link tag="li" to="/teachers"><a>Teachers</a></router-link> -->
-    <router-link tag="li" to="/students"><a>Students</a></router-link>
-    <router-link tag="li" to="/settings"><a>Settings</a></router-link>      
-    <li><a href="#" @click="logout()">Logout</a>
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hide">
-        @csrf
-    </form>
-    </li>
-</ul>
+<aside class="menu">
+     <ul class="menu-list">
+        <li><router-link to="/" exact>Dashboard</router-link></li>
+        <li><router-link to="/sections">Sections</router-link></li>
+        <!-- <li><router-link to="/teachers"><a>Teachers</a></router-link></li> -->
+        <li><router-link to="/students">Students</router-link></li>
+        <li><router-link to="/settings">Settings</router-link></li>      
+        <li><a href="#" @click="logout()">Logout</a>
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hide">
+            @csrf
+        </form>
+        </li>
+    </ul>
+</aside>

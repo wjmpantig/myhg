@@ -1,18 +1,23 @@
 <template>
 	<div>
-		<h3>Students</h3>
 		<span>Total students: {{students.length}}</span>
-		<table class="hover">
+		<table class="table is-bordered is-striped is-hoverable">
 			<thead>
 				<tr>
-					<td>Last name</td>
-					<td>First name</td>
+					<th>Last name</th>
+					<th>First name</th>
+					<th>Action</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="(student,index) in students">
 					<td>{{student.last_name}}</td>
 					<td>{{student.first_name}}</td>
+					<td>
+						<a class="has-text-danger">
+							<font-awesome-icon :icon="['fas','file-export']"></font-awesome-icon>		
+						</a>
+					</td>
 				</tr>
 			</tbody>
 		</table>
