@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<h1>Sections</h1>
+		<h2 class="title">Sections</h2>
 
-		<table class="hover">
+		<table class="table is-bordered is-striped is-hoverable">
 			<thead>
 				<tr>
 					<th>Name</th>
@@ -14,14 +14,14 @@
 					<td>
 						<span v-show="!section.isEditable"><router-link :to="{path:'sections/' + section.id}">{{section.name}}</router-link></span>
 						<form v-on:submit.prevent="updateSection(section,index)">
-							<span class="label alert" v-show="section.errors">
-								{{section.errors ? section.errors.errors['name'][0] : ""}}
-							</span>
-							<div class="input-group" v-show="section.isEditable">
-								<input class="input-group-field" type="text" placeholder="name" v-model="section.name" :disabled="section.isUpdating">
-								
+							
+							<div class="field" v-show="section.isEditable">
+								<input class="input" type="text" placeholder="name" v-model="section.name" :disabled="section.isUpdating">
+								<p class="help" v-show="section.errors">
+									{{section.errors ? section.errors.errors['name'][0] : ""}}
+								</p>								
 								<div class="input-group-button">
-									<button type="submit" class="button">Save</button>
+									<button type="submit" class="button is-primary">Save</button>
 									<button class="button secondary" v-on:click="toggleEditable(section,index)">Cancel</button>
 								</div>
 							</div>	
@@ -34,7 +34,7 @@
 					<td> 
 						<div v-show="!section.isEditable">
 							<a href="#" v-on:click="toggleEditable(section,index)"><font-awesome-icon :icon="['far','edit']"></font-awesome-icon></a>
-							<a href="#" class="alert" @click="confirmDeleteSection(section,index)"><font-awesome-icon :icon="['far','trash-alt']"></font-awesome-icon></a>
+							<a href="#" class="has-text-danger" @click="confirmDeleteSection(section,index)"><font-awesome-icon :icon="['far','trash-alt']"></font-awesome-icon></a>
 						</div>
 						
 					</td>

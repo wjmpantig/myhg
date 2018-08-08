@@ -1,34 +1,43 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="grid-container" id="app">
-        <div class="grid-x">
-            <div class="cell small-12">
+<div class="container" id="app">
+        <div class="column">
+            
                 <form action="login" method="post" v-on:submit="onSubmit()">
                     @csrf
 
-                    <h2>Login</h2>
+                    <h1 class="title">Login</h1>
                     
-                    @if ($errors->has('email'))
-                        <span class="label alert" role="alert">
-                            <strong>{{ $errors->first('email') }}</strong>
-                        </span>
-                    @endif    
+                   
+                    <div class="field">
+                        <input type="text" name="email" id="email" class="input" placeholder="Email">
+                     @if ($errors->has('email'))
+                        <p class="help is-danger">
+                            
+                                {{ $errors->first('email') }}
+                        </p>
+                    @endif      
+                    </div>
+                      
+                    <div class="field">
+                        <input type="password" id="password" name="password"  class="input" placeholder="Password">     
+                         @if ($errors->has('password'))
+                        <p class="help is-danger">
+                                {{ $errors->first('password') }}
+                        </p>
+                        @endif
+                    </div>
                     
-                    <input type="text" name="email" id="email" placeholder="Email">
-                     
-                    
-                    @if ($errors->has('password'))
-                        <span class="label alert" role="alert">
-                            <strong>{{ $errors->first('password') }}</strong>
-                        </span>
-                    @endif
-                    
-
-                    <input type="password" id="password" name="password" placeholder="Password">
                    
                     
-                    <button type="submit" class="button large">Log in</button>
+                    <div class="field">
+                        <div class="control">
+                            <button type="submit" class="button is-large is-primary">Log in</button>   
+                        </div>
+                    </div>
+                  
+                    
                 </form>
             </div>
         </div>

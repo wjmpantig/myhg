@@ -1,30 +1,29 @@
 <template>
 	<div>
-		<h3>{{score_type.name_plural}}</h3>
-		<div class="table-scroll">
-			<table class="hover">				
+		<div class="table-wrapper">
+			<table class="table is-hoverable is-bordered is-striped is-fullwidth is-narrow">				
 				<thead>
 					<tr>
-						<td>Total</td>
-						<td v-for="(score,index) in scores" class="text-center">
-							<input type="text" v-model="score.total" v-on:blur="updateTotal(score)" :disabled="score.isUpdating">
-						</td>
+						<th>Total</th>
+						<th v-for="(score,index) in scores" class="has-text-centered">
+							<input type="text" v-bind:class="{input:true,'is-danger':score.errors}" v-model="score.total" v-on:blur="updateTotal(score,index)" :disabled="score.isUpdating">
+						</th>
 					</tr>
 					<tr>
-						<td>Name</td>
-						<td v-for="(score,index) in scores" class="text-center">
+						<th>Name</th>
+						<th v-for="(score,index) in scores" class="has-text-centered">
 							<div>{{score.date | moment("MM/DD")}}</div>
-							<a @click="confirmDelete(score)" class="alert">
+							<a @click="confirmDelete(score)" class="has-text-danger">
 								<font-awesome-icon :icon="['fas','times']"></font-awesome-icon>
 							</a>
-						</td>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr v-for="(student,index) in students">
 						<td>{{ student.last_name}}, {{ student.first_name}}</td>
-						<td v-for="(score,index) in scores" class="text-center">
-							<input type="text" v-model="student.scores[score.id]" min="0" v-bind:max="score.total" v-on:blur="updateScore(score,student)">
+						<td v-for="(score,index) in scores" class="has-text-centered">
+							<input class="input" type="text" v-model="student.scores[score.id]" min="0" v-bind:max="score.total" v-on:blur="updateScore(score,student)">
 						</td>
 					</tr>
 				</tbody>
@@ -68,9 +67,27 @@
 				});
 			
 			},
-			updateTotal(score){
-				console.log(score);
+			updateTotal(score,index){
+				// console.log(score);
 				Vue.set(score,'isUpdating',true);
+				if(score.total.length ==0){
+					score.total = 0;
+				}
+				axios.post('/api/sections/'+this.$route.params.id+'/scores/'+this.$route.meta.type_id+'/'+score.id,score).then(response=>{
+						Vue.set(this.scores,index,response.data);
+					}).catch(err=>{
+						
+						if(err.response){
+							console.error(err.response.data.message);
+							Vue.set(this.scores[index],'errors',err.response.data.errors)
+
+						}else{
+							console.error(err);
+							Vue.set(this.scores[index],'errors',err);
+						}
+					}).then(()=>{
+						Vue.set(score,'isUpdating',false);
+					});
 			},
 			updateScore(score,student){
 				console.log('update called',score,student);

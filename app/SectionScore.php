@@ -17,4 +17,8 @@ class SectionScore extends Model
     public function section(){
    		return $this->belongsTo('App\Section');
    	}
+
+   	public function student_scores(){
+   		return $this->hasMany('App\StudentScore');
+   	}
 }

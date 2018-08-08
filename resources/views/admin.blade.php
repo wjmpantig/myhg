@@ -1,37 +1,36 @@
 @extends('layouts.app')
 @section('content')
+
 <div id="app">
-<div class="top-bar">
-    <div class="top-bar-left">
-        <ul class="menu">
-            <li class="menu-text">{{ config('app.name', 'MyHG') }}</li>
-            
-        </ul>
-
-    </div>
-    <div class="top-bar-right hide-for-large">
-        <ul class="menu dropdown" data-dropdown-menu>
-            <li>
-                <a href="#"><font-awesome-icon :icon="['fas','bars']"></font-awesome-icon></a>
-                @include('admin.menu')   
-            </li>
-           
-        </ul>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a href="/" class="navbar-item">
+                <h1 class="title">{{ config('app.name', 'MyHG') }}</h1>                
+            </a>
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+            </a>
+        </div>
+    </nav>
+    <section class="section">
         
+        
+            <div class="columns" id="sidebar">
+                <div class="column is-one-fifth">
+                    @include('admin.menu')
+                </div>
+                 <div class="column">
+                    <router-view></router-view>
+                </div>
+            </div>
+           
+        
+        
+    </section>
 
-    </div>
-</div>
-
-<div class="grid-container fluid">
-    <div class="grid-x grid-padding-x grid-padding-y">
-        <div class="cell show-for-large large-3" id="sidebar">
-           @include('admin.menu');
-        </div>
-        <div class="cell large-9">
-            <router-view></router-view>
-        </div>
-    </div>
-</div>
+    
 </div>
 @endsection
 @section('scripts')            

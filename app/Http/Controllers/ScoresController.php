@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\ScoreType;
 use App\SectionScore;
+use App\StudentScore;
 use DB;
 use Log;
 class ScoresController extends Controller
@@ -81,6 +82,31 @@ class ScoresController extends Controller
 
     }
     public function updateScore(Request $request){
-
+    	
+    	$request->validate([
+    		'section_id'=>'exists:sections,id',
+    		'type_id'=>'exists:score_types,id',
+    		'score_id'=>'exists:sections_scores,id',
+    	
+    	]);
+    	$highest = StudentScore::select(DB::raw('max(score) as highest_score'))
+    		->where('section_score_id',$request->score_id)->first();
+    	
+    	if($highest){
+    		$highest = $highest->highest_score;
+    	}
+    	// Log::debug($highest);
+    	$request->validate([
+			'total'=>"required|numeric|between:$highest,9999.99"
+    	]);
+    	$score = SectionScore::where('section_id',$request->section_id)
+    		->where('score_type_id',$request->type_id)
+    		->where('id',$request->score_id)->first();
+    	if(!$score){
+    		return response('score doesnt exist',404);
+    	}
+    	$score->total = $request->total;
+    	$score->save();
+    	return $score;
     }
 }

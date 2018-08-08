@@ -1,29 +1,29 @@
 
 
-// Variables
-@import "variables";
+// // Variables
+// @import "variables";
 
-// Foundation
-@import '~foundation-sites/scss/foundation.scss';
-@import '~foundation-sites/scss/foundation.scss';
+// // Foundation
+// @import '~foundation-sites/scss/foundation.scss';
+// @import '~foundation-sites/scss/foundation.scss';
 @import '~vuejs-dialog/dist/vuejs-dialog.min.css';
-@include foundation-everything(true,false);
+// @include foundation-everything(true,false);
 
-#sidebar{
-	// background: $secondary-color;
-	.menu a{
-		// color: $white;
-	}
-}
+// #sidebar{
+// 	// background: $secondary-color;
+// 	.menu a{
+// 		// color: $white;
+// 	}
+// }
 
-.tabs-title.is-active a{
-	background: $tab-background-active;
-    color: $tab-active-color;
-}
+// .tabs-title.is-active a{
+// 	background: $tab-background-active;
+//     color: $tab-active-color;
+// }
 
-a.alert,span.alert-message{
-	color: $alert-color;
-}
+// a.alert,span.alert-message{
+// 	color: $alert-color;
+// }
 
 
 // table{
@@ -40,3 +40,8 @@ a.alert,span.alert-message{
 // 		}
 // 	}
 // }
+
+@import '~bulma/bulma';
+.table-wrapper{
+	overflow-x: auto;
+}
