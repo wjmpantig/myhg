@@ -3,7 +3,7 @@
 		<form @submit.prevent="addAttendance">
 			<div class="field has-addons">
 				<div class="control has-icons-left">
-					<datepicker placeholder="New date" v-bind:input-class="{'input':true,'is-danger': new_date.error}" v-model="new_date.date"></datepicker>
+					<datepicker placeholder="New date" v-bind:input-class="{'input':true,'is-danger': new_date.error}" v-model="new_date.date" format="MMM dd yyyy"></datepicker>
 					<span class="icon is-left">
 						<font-awesome-icon :icon="['far','calendar-alt']"></font-awesome-icon>
 					</span>
@@ -55,8 +55,7 @@ export default{
 			new_date: {
 				date: null,
 				error: null
-			},
-			test:'input'
+			}
 		}
 	},
 	mounted(){

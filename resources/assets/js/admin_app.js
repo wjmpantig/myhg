@@ -46,7 +46,7 @@ const router = new VueRouter({
 const app = new Vue({
 	router,
 	mounted(){
-		$('body').foundation();
+		// $('body').foundation();
 	},
 	methods:{
 		logout(){

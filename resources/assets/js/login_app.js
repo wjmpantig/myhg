@@ -25,7 +25,7 @@ const app = new Vue({
     	}
     },
     mounted(){
-    	$('body').foundation();    	
+    	// $('body').foundation();    	
     },
     methods:{
     	onSubmit(){

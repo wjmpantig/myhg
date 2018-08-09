@@ -79,8 +79,41 @@ class ScoresController extends Controller
     }
 
     public function updateStudentScore(Request $request){
-
+		$request->validate([
+    		'section_id'=>'exists:sections,id',
+    		'type_id'=>'exists:score_types,id',
+    		'score_id'=>'exists:sections_scores,id',
+    		'student_id'=>'exists:section_students,student_id'
+    	]);
+    	$highest = SectionScore::findOrFail($request->score_id);
+    	if(strlen($request->score)>0){
+	    	$request->validate([
+	    		'score'=>"numeric|between:0,$highest->total"
+	    	]);
+	    }
+    	$score = StudentScore::where('student_id',$request->student_id)
+    			->where('section_score_id',$request->score_id)->first();
+    	if(strlen($request->score) == 0){
+    		if($score){
+    			$score->delete();
+    			return "deleted score";
+    		}
+    		return "nothing to do";
+    	
+    	}
+    	if($score){
+    		$score->score = $request->score;
+    		$score->save();
+    		return $score;
+    	}
+    	$score = new StudentScore();
+    	$score->score = $request->score;
+    	$score->student_id = $request->student_id;
+    	$score->section_score_id = $request->score_id;
+    	$score->save();
+    	return $score;
     }
+    
     public function updateScore(Request $request){
     	
     	$request->validate([
@@ -108,5 +141,41 @@ class ScoresController extends Controller
     	$score->total = $request->total;
     	$score->save();
     	return $score;
+    }
+
+    public function addScore(Request $request){
+    	$messages = [
+    		'date.unique'=> 'Date already exists for that section'
+    	];
+    	$section_id = $request->section_idid;
+    	$date = $request->date;
+    	$date = Carbon::parse($date)->format('Y-m-d');
+    	// return $date;
+    	
+    	$request->validate(
+    		[
+				'section_id'=>'exists:sections,id',
+    			'type_id'=>'exists:score_types,id',
+				'date' => [
+					'required',
+					'date_format:Y-m-d',
+					Rule::unique('section_scores')->where(function($query) use($date,$section_id){
+						return $query->where('date',$date)
+							->where('section_id',$section_id)
+							->whereNull('deleted_at');
+					})
+				]
+    		]
+    	);
+
+    	$score = new SectionScore();
+    	$score->section_id = $section_id;
+    	$score->score_type_id = $request->type_id;
+    	$score->date = $date;
+    	$score->save();
+    	
+    	
+
+    	return $attendance;
     }
 }
