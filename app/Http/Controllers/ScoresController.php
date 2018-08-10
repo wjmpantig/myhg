@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\ScoreType;
 use App\SectionScore;
 use App\StudentScore;
+use Carbon\Carbon;
 use DB;
 use Log;
 class ScoresController extends Controller
@@ -147,7 +148,7 @@ class ScoresController extends Controller
     	$messages = [
     		'date.unique'=> 'Date already exists for that section'
     	];
-    	$section_id = $request->section_idid;
+    	$section_id = $request->section_id;
     	$date = $request->date;
     	$date = Carbon::parse($date)->format('Y-m-d');
     	// return $date;
@@ -172,10 +173,23 @@ class ScoresController extends Controller
     	$score->section_id = $section_id;
     	$score->score_type_id = $request->type_id;
     	$score->date = $date;
+    	$score->total = 0;
     	$score->save();
     	
     	
 
-    	return $attendance;
+    	return $score;
+    }
+
+    public function deleteScore(Request $request){
+	 	$request->validate([
+			'section_id'=>'exists:sections,id',
+			'type_id'=>'exists:score_types,id',
+			'score_id'=>'exists:sections_scores,id',
+	
+    	]);
+    	$score = SectionScore::findOrFail($request->score_id);
+    	$score->delete();
+    	return "total score deleted";
     }
 }

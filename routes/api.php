@@ -36,6 +36,7 @@ Route::middleware('auth:api')->group(function(){
 	Route::get('score_types/{id}','ScoresController@score_types');
 	Route::get('sections/{id}/scores/{type_id}','ScoresController@scores');
 	Route::put('sections/{section_id}/scores/{type_id}','ScoresController@addScore');
+	Route::delete('sections/{section_id}/scores/{type_id}/{score_id}','ScoresController@deleteScore');
 	Route::post('sections/{section_id}/scores/{type_id}/{score_id}','ScoresController@updateScore');
 	Route::post('sections/{section_id}/scores/{type_id}/{score_id}/{student_id}','ScoresController@updateStudentScore');
 

@@ -188,6 +188,28 @@
 				});
 
 			},
+			confirmDelete(date){
+
+				this.$dialog.confirm('Confirm delete date:\"'+this.$moment(date.date).format('MMM DD, YYYY')+'\"?',{
+					loader:true
+				}).then((dialog)=>{
+					this.deleteDate(date.id,dialog);
+				});
+			},
+			deleteDate(section_score_id,dialog){
+
+				axios.delete('/api/sections/'+this.$route.params.id+'/scores/'+this.$route.meta.type_id+'/' +section_score_id).then(response=>{
+					// console.log(response.data)
+					this.loadScores();
+					dialog.close()
+				}).catch(err=>{
+					dialog.close();
+					let error = err.response.data;
+					console.error(error);
+					let message = error.message ? error.message : error;
+					this.$dialog.alert('Error: ' + message);
+				});
+			},
 			addScore(){
 				this.new_date.error = null;
 				let date = this.new_date.date;
