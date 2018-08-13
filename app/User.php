@@ -20,6 +20,12 @@ class User extends Authenticatable
         'name', 'email', 'password',
     ];
 
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -33,6 +39,6 @@ class User extends Authenticatable
         return $this->hasMany('App\StudentAttendance','student_id');
     }
     public function sections(){
-        return $this->hasMany('App\Section_Student','student_id');
+        return $this->hasMany('App\SectionStudent','student_id');
     }
 }

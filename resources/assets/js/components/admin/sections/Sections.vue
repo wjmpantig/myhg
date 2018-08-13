@@ -16,18 +16,11 @@
 						<form v-on:submit.prevent="updateSection(section,index)">
 							
 							<div class="field" v-show="section.isEditable">
-								<input class="input" type="text" placeholder="name" v-model="section.name" :disabled="section.isUpdating">
-								<p class="help" v-show="section.errors">
+								<input v-bind:ref="'name_' + section.id" class="input" type="text" placeholder="name" v-model="section.name" :disabled="section.isUpdating" @blur="updateSection(section,index)">
+								<p class="help is-danger" v-show="section.errors">
 									{{section.errors ? section.errors.errors['name'][0] : ""}}
 								</p>								
-								<div class="input-group-button">
-									<button type="submit" class="button is-primary">Save</button>
-									<button class="button secondary" v-on:click="toggleEditable(section,index)">Cancel</button>
-								</div>
 							</div>	
-								<div v-show="section.errors && !section.isUpdating ">
-									<span class="alert-message">{{ section.errors ? section.errors.message : ""}}</span>
-								</div>	
 							<input type="hidden">
 						</form>
 					</td>
@@ -45,7 +38,7 @@
 </template>
 <script>
 export default{
-	data:function(){
+	data(){
 		return {
 			season: null,
 			sections: [],
@@ -68,7 +61,11 @@ export default{
 		toggleEditable(section,index){
 			Vue.set(section,'isEditable',!section.isEditable);
 			// section.isEditable = !section.isEditable;
+			let el = this.$refs['name_' + section.id][0];
 			
+			Vue.nextTick(()=>{
+				el.focus();
+			})
 		},
 		updateSection(section,index){
 			Vue.set(section,'isUpdating', true);

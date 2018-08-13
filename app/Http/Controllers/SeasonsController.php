@@ -12,10 +12,14 @@ class SeasonsController extends Controller
     }
 
     public function all(){
-    	return Season::all();
+    	return Season::orderBy('created_at','desc')
+            ->orderBy('id','desc')
+            ->get();
     }
 
     public function latest(){
-    	return Season::orderBy('created_at','desc')->first();
+    	return Season::orderBy('created_at','desc')
+            ->orderBy('id','desc')
+            ->first();
     }
 }

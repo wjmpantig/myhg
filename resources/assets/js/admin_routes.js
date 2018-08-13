@@ -44,6 +44,18 @@ module.exports={
 			}
 		]
 	},
+	{
+		path: '/students',
+		component: require('./components/admin/students/Students.vue')
+	},
+	{
+		path:'/students/:id',
+		component:require('./components/admin/students/Student.vue')
+	},
+	{
+		path:'/transfer/:id',
+		component:require('./components/admin/students/TransferStudent.vue')
+	}
 ]
 
 };

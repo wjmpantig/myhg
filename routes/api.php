@@ -40,4 +40,6 @@ Route::middleware('auth:api')->group(function(){
 	Route::post('sections/{section_id}/scores/{type_id}/{score_id}','ScoresController@updateScore');
 	Route::post('sections/{section_id}/scores/{type_id}/{score_id}/{student_id}','ScoresController@updateStudentScore');
 
+	Route::get('students','StudentsController@all');
+	Route::get('students/{id}','StudentsController@get');
 });

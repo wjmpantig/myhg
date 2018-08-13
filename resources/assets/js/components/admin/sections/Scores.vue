@@ -217,7 +217,7 @@
 				if(date != null){
 					date = this.$moment(date).format('YYYY-MM-DD');
 				}
-				console.log(date);
+				// console.log(date);
 				axios.put('/api/sections/'+this.$route.params.id+'/scores/'+this.$route.meta.type_id,{
 					date
 				}).then(response=>{
