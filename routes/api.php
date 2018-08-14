@@ -42,4 +42,6 @@ Route::middleware('auth:api')->group(function(){
 
 	Route::get('students','StudentsController@all');
 	Route::get('students/{id}','StudentsController@get');
+	Route::get('students/{id}/attendance/{section_id}','StudentsController@attendance');
+	Route::get('students/{id}/scores/{section_id}','StudentsController@scores');
 });

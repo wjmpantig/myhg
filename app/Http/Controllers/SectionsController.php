@@ -24,8 +24,11 @@ class SectionsController extends Controller
 
     public function all(Request $request){
     	$season = empty($request->season_id) ? Season::orderBy('created_at','desc')->first() : Season::findOrFail($request->season_id);
-		$sections = Section::where('season_id',$season->id)->get();
-		return $sections;
+		$sections = Section::where('season_id',$season->id);
+        if($request->except){
+            $sections = $sections->whereNotIn('id',[$request->except]);
+        }
+		return $sections->get();
     }
 
     public function update(Request $request){
