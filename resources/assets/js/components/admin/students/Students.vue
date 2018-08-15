@@ -1,10 +1,16 @@
 <template>
 	<div>
 		<h2 class="title">Students</h2>
-		<div class="select">
-			<select v-model="season" @change="loadStudents()">
-				<option v-for="season in seasons" :value="season.id">{{season.name}}</option>
-			</select>
+		<div class="field">
+			<label for="season" class="label">Season</label>
+			<div class="control">
+				<div class="select" name="season">
+					<select v-model="season" @change="loadStudents()">
+						<option v-for="season in seasons" :value="season.id">{{season.name}}</option>
+					</select>
+				</div>
+				
+			</div>
 		</div>
 		<span>Total students: {{students.length}}</span>
 		<table class="table is-bordered is-striped is-hoverable">
@@ -20,7 +26,7 @@
 					<td><router-link :to="{path:'/students/'+ student.id}">{{student.name}}</router-link></td>
 					<td>{{student.section_name}}</td>
 					<td>
-						<router-link :to="{path:'/transfer/'+student.id}" class="has-text-danger">
+						<router-link :to="{path:'/students/'+student.id+'/transfer'}" class="has-text-danger">
 							<font-awesome-icon :icon="['fas','file-export']"></font-awesome-icon>		
 						</router-link>	
 						

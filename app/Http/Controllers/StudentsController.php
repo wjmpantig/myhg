@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\User;
 use App\UserType;
 use App\Season;
 use App\Student_Section;
 use App\Section;
+use App\SectionStudent;
 use App\SectionAttendance;
 use App\StudentAttendance;
 use App\SectionScore;
@@ -15,6 +17,7 @@ use App\StudentScore;
 use App\ScoreType;
 use Log;
 use DB;
+use Validator;
 class StudentsController extends Controller
 {
     public function all(Request $request){
@@ -53,7 +56,10 @@ class StudentsController extends Controller
             ->where('student_id',$request->id)
             ->get();
         $attendance = $attendance->mapWithKeys(function($item){
-            return [$item['section_attendance_id']=>$item['is_present']];
+            return [$item['section_attendance_id']=>[
+                'id'=>$item['section_attendance_id'],
+                'is_present'=>$item['is_present']
+            ]];
         });
         $resp = new \stdClass();
         $resp->dates = $dates->isEmpty() ? new\stdClass() : $dates;
@@ -69,23 +75,12 @@ class StudentsController extends Controller
             ->where('student_id',$request->id)
             ->get();
 
-        // $scores = $scores->mapToGroups(function($item,$key){
-            
-        //     return [ 
-        //         $item['score_type_id']=>[
-        //                 $item['id']=>[
-        //                     'date'=>$item['date'],
-        //                     'total'=>$item['total']
-        //             ]
-        //         ]
-        //     ];
-        // });
-
         $scores = $scores->groupBy('score_type_id');
 
         $scores = $scores->map(function($item,$key){
             $item = $item->mapWithKeys(function($item){
                 return [$item['id']=>[
+                    'id'=>$item['id'],
                     'date'=>$item['date'],
                     'total'=>$item['total']
                 ]];
@@ -95,7 +90,10 @@ class StudentsController extends Controller
 
         
         $student_scores = $student_scores->mapWithKeys(function($item,$key){
-            return [$item['section_score_id']=>$item['score']];
+            return [$item['section_score_id']=>[
+                'id'=>$item['section_score_id'],
+                'score'=>$item['score']
+            ]];
         });
 
         $resp = new \stdClass();
@@ -103,5 +101,80 @@ class StudentsController extends Controller
         $resp->scores = $student_scores->isEmpty() ? new\stdClass() : $student_scores;
         return response()->json($resp);
         
+    }
+
+    public function transfer(Request $request){
+
+        $id = $request->id;
+        $from_section_id = $request->from_section_id;
+        $target_section_id = $request->target_section_id;
+        $request->validate([
+            'id'=>[
+                Rule::unique('section_students')->where(function($query) use($id,$from_section_id){
+                    return $query->where('student_id',$id)
+                        ->where('section_id',$from_section_id)
+                        ->whereNull('deleted_at');
+                })
+            ],
+            'target_section_id'=>[
+                "required",
+                Rule::exists('sections','id')->where(function($query) use ($from_section_id,$target_section_id){
+                    $query->where('id',$target_section_id)->whereNotIn('id',[$from_section_id]);
+                    // Log::debug($query->toSql());
+                })
+            ],
+            'data.attendance.*.id'=>"exists:section_attendances,id",
+            'data.attendance.*.is_present'=>'boolean',
+            'data.scores.*'=>[
+                function($attrs,$val,$fail){
+                    
+                    $total = SectionScore::find($val['id']);
+                    // Log::debug($total);
+                    if(!$total){
+                        // Log::debug("empty id");
+                        return $fail("$attrs is invalid.");
+                    }
+                    $score = $val['score'];
+                    if(!empty($score) && !is_numeric($score)){
+                        // Log::debug("non numeric");
+                        return $fail("$attrs is invalid.");
+                    }
+                    if($score < 0 || $score > $total->total ){
+                        // Log::debug("not between 0-$total->total");
+                        return $fail("$attrs must be between 0 and $total->total");
+                    }
+
+                    // Log::debug("end;");
+                }
+            ]
+            
+        ]);
+        $user = User::findOrFail($request->id);
+        try{
+            DB::beginTransaction();
+            $from_section = SectionStudent::where('student_id',$id)
+                ->where('section_id',$from_section_id)
+                ->firstOrFail();
+            $from_section->delete();
+            $attendances = $request->data['attendance'];
+            foreach($attendances as $attendance){
+                $a = new StudentAttendance();
+                $a->student_id=$id;
+                $a->section_attendance_id = $attendance['id'];
+                $a->is_present = $attendance['is_present'];
+                $a->save();
+            }
+            $scores = $request->data['scores'];
+            foreach($scores as $score){
+                
+            }
+            throw new Exception("nothing");
+            DB::commit();
+        }catch(Exception $e){
+            DB::rollBack();
+            throw $e;
+        }
+        return "something";
+
     }
 }

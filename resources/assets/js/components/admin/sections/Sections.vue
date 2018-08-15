@@ -1,7 +1,17 @@
 <template>
 	<div>
 		<h2 class="title">Sections</h2>
-
+		<div class="field">
+			<label for="season" class="label">Season</label>
+			<div class="control">
+				<div class="select" name="season">
+					<select v-model="season" @change="loadSections()">
+						<option v-for="season in seasons" :value="season.id">{{season.name}}</option>
+					</select>
+				</div>
+				
+			</div>
+		</div>
 		<table class="table is-bordered is-striped is-hoverable">
 			<thead>
 				<tr>
@@ -42,22 +52,35 @@ export default{
 		return {
 			season: null,
 			sections: [],
+			seasons: [],
 		}
 	},
 	mounted(){
-
+		axios.get('/api/seasons').then(response=>{
+				this.seasons = response.data;
+				this.season = this.seasons[0].id;
+				this.loadSections();
+			});
 		// axios.get('api/seasons/').then(response=>{
 		// 	console.log(response)
 		// }).catch(err=>{
 		// 	console.error(err);
 		// });
-		axios.get('api/sections/').then(response=>{
-			this.sections = response.data;
-		}).catch(err=>{
-			console.error(err);
-		});
+		
 	},
 	methods:{
+		loadSections(){
+			this.sections = [];
+			axios.get('api/sections/',{
+				params:{
+					season_id: this.season
+				}
+			}).then(response=>{
+				this.sections = response.data;
+			}).catch(err=>{
+				console.error(err);
+			});
+		},
 		toggleEditable(section,index){
 			Vue.set(section,'isEditable',!section.isEditable);
 			// section.isEditable = !section.isEditable;
