@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<h2 class="title">Students</h2>
+		<router-link :to="{path:'/students/new'}" class="button is-primary">Add new Student</router-link>
 		<div class="field">
 			<label for="season" class="label">Season</label>
 			<div class="control">
@@ -25,7 +26,7 @@
 				<tr v-for="(student,index) in students">
 					<td><router-link :to="{path:'/students/'+ student.id}">{{student.name}}</router-link></td>
 					<td>{{student.section_name}}</td>
-					<td>
+					<td class="has-text-centered">
 						<router-link :to="{path:'/students/'+student.id+'/transfer'}" class="has-text-danger">
 							<font-awesome-icon :icon="['fas','file-export']"></font-awesome-icon>		
 						</router-link>	

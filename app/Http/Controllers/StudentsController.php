@@ -29,6 +29,7 @@ class StudentsController extends Controller
     		->join('sections','sections.id','=','section_students.section_id')
 			->where('user_type_id',$student_type->id)
 			->where('season_id',$season->id)
+            ->whereNull('section_students.deleted_at')
 			->orderBy('last_name');
 		// Log::debug($students->toSql());
     	$students = $students->get();
@@ -43,9 +44,54 @@ class StudentsController extends Controller
     		->join('section_students','sections.id','=','section_students.section_id')
     		->join('seasons','seasons.id','=','sections.season_id')
     		->where('student_id',$student->id)
+            ->whereNull('section_students.deleted_at')
     		->get();
     	$student->sections = $sections;
     	return $student;
+    }
+
+    public function create(Request $request){
+        $request->validate([
+            'first_name'=>'required|max:100',
+            'last_name'=>'required|max:100',
+            'section'=>'exists:sections,id'
+        ]);
+        $student_type = UserType::where('name','Student')->first();
+    }
+
+    public function update(Request $request){
+        $request->validate([
+            'id'=>'exists:users,id',
+            'first_name'=>'sometimes|required|max:100',
+            'last_name'=>'sometimes|required|max:100',
+            'email'=>[
+                'sometimes',
+                'required',
+                'email',
+                'max:100',
+                Rule::unique('users')->ignore($request->id)
+            ]
+        ]);
+        $student_type = UserType::where('name','Student')->first();
+        $student = User::where('user_type_id',$student_type->id)->where('id',$request->id)->firstOrFail();
+        $has_changes = false;
+
+        $fields = ['first_name','last_name','email'];
+        foreach($fields as $field){
+            if($request->filled($field)){
+                $student[$field] = trim($request[$field]);
+                $has_changes = true;
+            }
+        }
+        
+        if($request->filled('last_name')){
+            $student->last_name = trim($request->last_name);
+        }
+        if($request->filled('email')){
+            $student->email = trim($request->email);
+        }
+        $student->save();
+        return $student;
     }
 
     public function attendance(Request $request){
@@ -158,23 +204,44 @@ class StudentsController extends Controller
             $from_section->delete();
             $attendances = $request->data['attendance'];
             foreach($attendances as $attendance){
-                $a = new StudentAttendance();
-                $a->student_id=$id;
-                $a->section_attendance_id = $attendance['id'];
+                if(is_null($attendance['is_present'])){
+                    continue;
+                }
+                $a = StudentAttendance::where('student_id',$id)
+                    ->where('section_attendance_id',$attendance['id'])->first();
+                if(!$a){
+                    $a = new StudentAttendance();
+                    $a->student_id=$id;
+                    $a->section_attendance_id = $attendance['id'];
+                }
                 $a->is_present = $attendance['is_present'];
                 $a->save();
             }
             $scores = $request->data['scores'];
             foreach($scores as $score){
-                
+                if(is_null( $score['score'])){
+                    continue;
+                }
+                $s = StudentScore::where('student_id',$id)
+                    ->where('section_score_id',$score['id'])->first();
+                if($s){
+                    $s = new StudentScore();
+                    $s->section_score_id = $score['id'];
+                    $s->student_id=$id;
+                }
+                $s->score = $score['score'];
+                $s->save();
             }
-            throw new Exception("nothing");
+            $target_section = new SectionStudent();
+            $target_section->student_id = $id;
+            $target_section->section_id = $target_section_id;
+            $target_section->save();
             DB::commit();
         }catch(Exception $e){
             DB::rollBack();
             throw $e;
         }
-        return "something";
+        return "transfer complete";
 
     }
 }

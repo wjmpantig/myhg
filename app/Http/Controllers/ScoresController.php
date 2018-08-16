@@ -56,6 +56,7 @@ class ScoresController extends Controller
     		->where('section_id',$request->id)
     		->whereNull('users.deleted_at')
     		->whereNull('sections.deleted_at')
+            ->whereNull('section_students.deleted_at')
     		->orderBy('last_name');
     	// Log::debug($students->toSql());
 		$students = $students->get();    		

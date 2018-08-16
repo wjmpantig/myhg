@@ -34,7 +34,7 @@
 							<input type="hidden">
 						</form>
 					</td>
-					<td> 
+					<td class="has-text-centered"> 
 						<div v-show="!section.isEditable">
 							<a href="#" v-on:click="toggleEditable(section,index)"><font-awesome-icon :icon="['far','edit']"></font-awesome-icon></a>
 							<a href="#" class="has-text-danger" @click="confirmDeleteSection(section,index)"><font-awesome-icon :icon="['far','trash-alt']"></font-awesome-icon></a>

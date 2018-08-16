@@ -45,3 +45,20 @@
 .table-wrapper{
 	overflow-x: auto;
 }
+// table.table{
+// 	overflow: hidden;
+// 	td,th{
+// 		position: relative;
+// 		&:hover::after{
+// 			content: "";
+// 			position: absolute;
+// 			background-color: $table-row-hover-background-color;
+// 			left: 0;
+// 			top: -5000px;
+// 			height: 10000px;
+// 			width: 100%;
+// 			z-index: -1;
+
+// 		}
+// 	}
+// }

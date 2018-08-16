@@ -297,6 +297,9 @@
 					// console.log(response.data)
 					
 					dialog.close()
+					this.$dialog.alert('Transfer student completed!').then(dialog=>{
+						this.$router.push({path:"/sections/"+this.target_section.id});
+					});
 				}).catch(err=>{
 					dialog.close();
 					let error = err.response.data;

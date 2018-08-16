@@ -69,6 +69,7 @@ class SectionsController extends Controller
 			->join('section_students','student_id','=','users.id')
     		->where('user_type_id',$student_type->id)
     		->where('section_id',$request->id)
+            ->whereNull('section_students.deleted_at')
     		->orderBy('last_name','asc')
     		->get();
     	return $students;
@@ -101,6 +102,7 @@ class SectionsController extends Controller
     		->where('section_id',$request->id)
     		->whereNull('users.deleted_at')
     		->whereNull('sections.deleted_at')
+            ->whereNull('section_students.deleted_at')
     		->orderBy('last_name')
     		->get();
     	foreach($students as $student){
