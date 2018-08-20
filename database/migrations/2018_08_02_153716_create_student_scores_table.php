@@ -19,7 +19,7 @@ class CreateStudentScoresTable extends Migration
             $table->unsignedBigInteger('student_id');
             $table->unsignedDecimal('score',6,2);
             $table->timestamps();
-            $table->foreign('section_scores_id')->references('id')->on('section_scores');
+            $table->foreign('section_score_id')->references('id')->on('section_scores');
             $table->foreign('student_id')->references('id')->on('users');
 
         });

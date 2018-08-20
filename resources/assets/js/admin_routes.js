@@ -61,6 +61,14 @@ module.exports={
 		component:require('./components/admin/students/Student.vue')
 	},
 	{
+		path:'/settings/',
+		component:require('./components/admin/Settings.vue')
+	},
+	{
+		path:'/users/create',
+		component:require('./components/admin/users/CreateUser.vue')
+	},
+	{
 		path:'*',
 		component:require('./components/404.vue')
 	},

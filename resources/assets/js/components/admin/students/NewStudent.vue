@@ -37,9 +37,19 @@
 					</div>
 					
 				</div>
+				<p class="help is-danger" v-show="hasError('section')">{{getError('section')}}</p>
 			</div>
-			<button class="button is-primary" type="submit">Submit</button>
+			<button class="button is-primary" type="submit">Submit and create new</button>
 		</form>
+		<div v-show="new_students.length > 0">
+			<h4 class="title is-4">New students</h4>
+			<ul>
+				<li v-for="student,i in new_students">
+					<router-link  :to="{path: '/students/'+student.id}">{{student.last_name}}, {{student.first_name}}</router-link>
+				</li>
+			</ul>
+		</div>
+		
 	</div>
 </template>
 <script>
@@ -53,6 +63,7 @@
 				seasons:[],
 				sections:[],
 				season:{},
+				new_students:[]
 
 			}
 		},
@@ -94,7 +105,24 @@
 				});
 			},
 			submit(){
-				console.log('submit')
+				this.errors = {};
+				axios.post('api/students/add',{
+					first_name:this.first_name,
+					last_name:this.last_name,
+					section:this.section
+				}).then(response=>{
+					console.log(response.data)
+					this.new_students.push(response.data);
+					this.clear();
+				}).catch(error=>{
+					console.error(error);
+					this.errors = error.response.data;
+				})
+				
+			},
+			clear(){
+				this.first_name=null;
+				this.last_name = null;
 			}
 		}
 	}

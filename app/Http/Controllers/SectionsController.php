@@ -12,8 +12,9 @@ use App\ScoreType;
 use App\SectionScore;
 use App\User;
 use App\UserType;
-use DB;
 use Carbon\Carbon;
+use Auth;
+use DB;
 use Log;
 class SectionsController extends Controller
 {
@@ -39,6 +40,7 @@ class SectionsController extends Controller
     	$section = Section::findOrFail($request->id);
     	$section->name = $request->name;
     	$section->save();
+        Log::info(sprintf("user %d updated section %d",Auth::user()->id,$request->id));
     	return $section;
     }
 
@@ -48,6 +50,7 @@ class SectionsController extends Controller
     	]);
     	$section = Section::findOrFail($request->id);
     	$section->delete();
+        Log::info(sprintf("user %d deleted section %d",Auth::user()->id,$request->id));
     	return "Delete success";
     }
 
@@ -119,31 +122,36 @@ class SectionsController extends Controller
 
     public function updateAttendance(Request $request){
     	$request->validate([
-    		'id'=>'required|exists:sections,id',
+    		'id'=>'exists:sections,id',
     		'section_attendance_id'=>'required|exists:section_attendances,id',
     		'student_id' =>'required|exists:users,id',
     		'value'=>'required|required|boolean'
     	]);
     	
     	$attendance = StudentAttendance::where('student_id',$request->student_id)
-    	->where('section_attendance_id',$request->id)
+    	->where('section_attendance_id',$request->section_attendance_id)
     	->first();
     	if($attendance){
     		if($request->value){
     			$attendance->is_present = $request->value;
     			$attendance->save();
+                Log::info(sprintf("user %d updated attendance of %d for attendance %d",Auth::user()->id,$request->student_id,$attendance->id));
+
     			return $attendance;
     		}
     		$attendance->delete();
+            Log::info(sprintf("user %d deleted attendance of %d for attendance %d",Auth::user()->id,$request->student_id,$attendance->id));
+
     		return "record deleted";
     		
     	}
     	if($request->value){
 	    	$attendance = new StudentAttendance();
 	    	$attendance->student_id = $request->student_id;
-	    	$attendance->section_attendance_id=$request->id;
+	    	$attendance->section_attendance_id=$request->section_attendance_id;
 	    	$attendance->is_present = $request->value;
 	    	$attendance->save();
+            Log::info(sprintf("user %d created attendance of %d for attendance %d",Auth::user()->id,$request->student_id,$attendance->id));
 	    	return $attendance;
 	    }
 
@@ -158,6 +166,8 @@ class SectionsController extends Controller
     	// return $request->section_attendance_id;
     	$attendance = SectionAttendance::findOrFail($request->section_attendance_id);
     	$attendance->delete();
+        Log::info(sprintf("user %d deleted attendance %d for section %d",Auth::user()->id,$attendance->id,$attendance->section_id));
+
     	return "attendance deleted";
     }
 
@@ -190,8 +200,8 @@ class SectionsController extends Controller
     	$attendance->date = $date;
     	$attendance->save();
     	
-    	
-
+        Log::info(sprintf("user %d added attendance %d for section %d",Auth::user()->id,$attendance->id,$attendance->section_id));
+    
     	return $attendance;
     }
 

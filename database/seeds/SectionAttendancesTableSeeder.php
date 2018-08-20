@@ -19,7 +19,9 @@ class SectionAttendancesTableSeeder extends Seeder
         $date = Carbon::createFromDate(2018,6,16);
         // $this->command->info($date->toDayDateTimeString());
         // $date->subMonth(15);
-        $date->subWeeks(34);
+        if(!App::environment(['production','staging'])){
+            $date->subWeeks(34);
+        }
         // $this->command->info($date->toDayDateTimeString());
         // return;
         $seasons = Season::with('sections')->get();

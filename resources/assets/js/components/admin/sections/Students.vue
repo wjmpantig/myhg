@@ -4,16 +4,16 @@
 		<table class="table is-bordered is-striped is-hoverable">
 			<thead>
 				<tr>
-					<th>Last name</th>
-					<th>First name</th>
-					<th>Action</th>
+					<th>Name</th>
+					
+					<th>Transfer</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="(student,index) in students">
-					<td>{{student.last_name}}</td>
-					<td>{{student.first_name}}</td>
-					<td>
+					<td>{{student.last_name}}, {{student.first_name}}</td>
+					<td class="has-text-centered">
+
 						<router-link :to="{path:'/students/'+student.id+'/transfer'}" class="has-text-danger">
 							<font-awesome-icon :icon="['fas','file-export']"></font-awesome-icon>		
 						</router-link>	

@@ -20,6 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::middleware('auth:api')->group(function(){
 	Route::get('seasons','SeasonsController@all');
 	Route::get('seasons/latest','SeasonsController@latest');
+	Route::get('user_types','UserTypesController@all');
 
 	Route::get('sections','SectionsController@all');
 	Route::get('sections/{id}','SectionsController@get');
@@ -41,9 +42,14 @@ Route::middleware('auth:api')->group(function(){
 	Route::post('sections/{section_id}/scores/{type_id}/{score_id}/{student_id}','ScoresController@updateStudentScore');
 
 	Route::get('students','StudentsController@all');
+	Route::post('students/add','StudentsController@create');
 	Route::get('students/{id}','StudentsController@get');
 	Route::post('students/{id}','StudentsController@update');
 	Route::get('students/{id}/attendance/{section_id}','StudentsController@attendance');
 	Route::get('students/{id}/scores/{section_id}','StudentsController@scores');
 	Route::post('students/{id}/transfer','StudentsController@transfer');
+
+	Route::post('user/password','UsersController@update_password');
+
+	Route::post('users/','UsersController@create');
 });

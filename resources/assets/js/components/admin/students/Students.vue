@@ -19,7 +19,7 @@
 				<tr>
 					<th>Name</th>
 					<th>Section</th>
-					<th>Action</th>
+					<th>Transfer</th>
 				</tr>
 			</thead>
 			<tbody>

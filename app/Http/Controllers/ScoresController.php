@@ -9,6 +9,7 @@ use App\StudentScore;
 use Carbon\Carbon;
 use DB;
 use Log;
+use Auth;
 class ScoresController extends Controller
 {
 	public function __construct()
@@ -98,21 +99,24 @@ class ScoresController extends Controller
     	if(strlen($request->score) == 0){
     		if($score){
     			$score->delete();
+                Log::info(sprintf("user %d deleted score of student %d for total %d",Auth::user()->id,$request->student_id,$request->score_id));
     			return "deleted score";
     		}
     		return "nothing to do";
     	
     	}
-    	if($score){
-    		$score->score = $request->score;
-    		$score->save();
-    		return $score;
-    	}
-    	$score = new StudentScore();
-    	$score->score = $request->score;
-    	$score->student_id = $request->student_id;
-    	$score->section_score_id = $request->score_id;
+        if($score){
+            $score->score = $request->score;
+            $score->save();
+            Log::info(sprintf("user %d updated score of student %d for total %d",Auth::user()->id,$request->student_id,$request->score_id));
+            return $score;
+        }
+        $score = new StudentScore();
+        $score->score = $request->score;
+        $score->student_id = $request->student_id;
+        $score->section_score_id = $request->score_id;
     	$score->save();
+        Log::info(sprintf("user %d created score of student %d for total %d",Auth::user()->id,$request->student_id,$request->score_id));
     	return $score;
     }
     
@@ -142,6 +146,8 @@ class ScoresController extends Controller
     	}
     	$score->total = $request->total;
     	$score->save();
+        Log::info(sprintf("user %d updated total score %d for section %d",Auth::user()->id,$request->score_id,$request->section_id));
+
     	return $score;
     }
 
@@ -177,6 +183,7 @@ class ScoresController extends Controller
     	$score->total = 0;
     	$score->save();
     	
+        Log::info(sprintf("user %d created total score %d for section %d",Auth::user()->id,$score->id,$request->section_id));
     	
 
     	return $score;
@@ -191,6 +198,8 @@ class ScoresController extends Controller
     	]);
     	$score = SectionScore::findOrFail($request->score_id);
     	$score->delete();
+        Log::info(sprintf("user %d deleted total score %d for section %d",Auth::user()->id,$score->id,$request->section_id));
+
     	return "total score deleted";
     }
 }

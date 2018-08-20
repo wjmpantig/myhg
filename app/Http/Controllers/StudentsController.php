@@ -15,9 +15,11 @@ use App\StudentAttendance;
 use App\SectionScore;
 use App\StudentScore;
 use App\ScoreType;
+use Auth;
 use Log;
 use DB;
 use Validator;
+use Faker\Factory;
 class StudentsController extends Controller
 {
     public function all(Request $request){
@@ -54,9 +56,42 @@ class StudentsController extends Controller
         $request->validate([
             'first_name'=>'required|max:100',
             'last_name'=>'required|max:100',
-            'section'=>'exists:sections,id'
+            'section'=>'required|exists:sections,id'
         ]);
         $student_type = UserType::where('name','Student')->first();
+        $faker = Factory::create();
+        $user = new User();
+        $user->first_name=trim($request->first_name);
+        $user->last_name=$request->last_name;
+        $user->user_type_id = $student_type->id;
+        $user->password = bcrypt($faker->password);
+
+        $user->email = $this->generateRandomEmail($user->first_name,$user->last_name,$faker);
+        
+        $user->save();
+        $section_student = new SectionStudent();
+        $section_student->student_id = $user->id;
+        $section_student->section_id = $request->section;
+        $section_student->save();
+        Log::info(sprintf("user %d created student %d in section %d",Auth::user()->id,$user->id,$request->section));
+
+        return $user;
+    }
+
+    private function generateRandomEmail($first_name,$last_name,$faker = null){
+        if (!$faker){
+            $faker = Factory::create();
+        }
+    
+        do{
+            $email = sprintf("%s.%s%d@gmail.com",str_slug($first_name),str_slug($last_name),$faker->randomNumber(5));
+            $user = User::where('email',$email)->first();
+            if($user){
+                continue;
+            }
+            break;
+        }while(true);
+        return $email;
     }
 
     public function update(Request $request){
@@ -91,6 +126,8 @@ class StudentsController extends Controller
             $student->email = trim($request->email);
         }
         $student->save();
+        Log::info(sprintf("user %d updated student %d",Auth::user()->id,$student->id));
+
         return $student;
     }
 
@@ -241,6 +278,8 @@ class StudentsController extends Controller
             DB::rollBack();
             throw $e;
         }
+        Log::info(sprintf("user %d transfered student %d from section %d to %d",Auth::user()->id,$id,$from_section_id,$target_section_id));
+
         return "transfer complete";
 
     }
