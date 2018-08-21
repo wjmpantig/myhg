@@ -8,11 +8,12 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-regular-svg-icons/faEdit';
 import {faBars} from '@fortawesome/free-solid-svg-icons/faBars';
 import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
+import {faSearch} from '@fortawesome/free-solid-svg-icons/faSearch';
 import {faTrashAlt} from '@fortawesome/free-regular-svg-icons/faTrashAlt';
 import {faCalendarAlt} from '@fortawesome/free-regular-svg-icons/faCalendarAlt';
 import {faFileExport} from '@fortawesome/free-solid-svg-icons/faFileExport';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faEdit,faTrashAlt,faBars,faTimes,faFileExport,faCalendarAlt);
+library.add(faEdit,faTrashAlt,faBars,faTimes,faSearch,faFileExport,faCalendarAlt);
 
 
 require('./bootstrap');

@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h2 class="title">Students</h2>
-		<router-link :to="{path:'/students/new'}" class="button is-primary">Add new Student</router-link>
+		<router-link :to="{path:'/students/new'}" class="button is-info">Add new Student</router-link>
 		<div class="field">
 			<label for="season" class="label">Season</label>
 			<div class="control">
@@ -15,16 +15,14 @@
 		</div>
 	
 		<div class="field is-grouped">
-			<div class="control">
+			<div class="control has-icons-left">
 				<input type="text" class="input" placeholder="Search a name" v-model="search" v-debounce:300="loadStudents">
+				<span class="icon is-left">
+					<font-awesome-icon :icon="['fas','search']"></font-awesome-icon>		
+				</span>
 			</div>
 		</div>
-	
-		<span>Total students: {{students.total}}</span>
-		<nav>
-			<a class="pagination-previous" v-show="students.current_page > 1" @click="prev()">Previous</a>
-			<a class="pagination-next"  v-show="students.current_page < students.last_page" @click="next()">Next</a>
-		</nav>
+		<span>Showing {{students.from}}-{{students.to}} of {{students.total}} students</span>
 		<table class="table is-bordered is-striped is-hoverable">
 			<thead>
 				<tr>
