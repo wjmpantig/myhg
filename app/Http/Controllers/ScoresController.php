@@ -40,17 +40,17 @@ class ScoresController extends Controller
 			->orderBy('date')
 			->get();
 		
-		$raw = "(select group_concat( concat(section_scores.id,':',score) separator ',') from student_scores 
-			join section_scores on section_scores.id = student_scores.section_score_id
-			where score_type_id = $type_id and student_scores.student_id = users.id and section_scores.deleted_at is null
+		// $raw = "(select group_concat( concat(section_scores.id,':',score) separator ',') from student_scores 
+		// 	join section_scores on section_scores.id = student_scores.section_score_id
+		// 	where score_type_id = $type_id and student_scores.student_id = users.id and section_scores.deleted_at is null
 			
-			group by student_id
-			order by date) as scores
-		";
+		// 	group by student_id
+		// 	order by date) as scores
+		// ";
 
 		$students = DB::table('section_students')
-			->select('users.id as id','first_name','last_name',
-				DB::raw($raw)
+			->select('users.id as id','first_name','last_name'
+				// DB::raw($raw)
 			)
     		->leftJoin('users','student_id','=','users.id')
     		->leftJoin('sections','sections.id','=','users.id')
@@ -65,11 +65,18 @@ class ScoresController extends Controller
 
     	foreach($students as $student){
     		
-    		$student->scores = $student->scores ?  collect(array_map(function ($score){
-    			return explode(':',$score);
-    		}, explode(',', $student->scores)))->toAssoc() : [];
+    		// $student->scores = $student->scores ?  collect(array_map(function ($score){
+    		// 	return explode(':',$score);
+    		// }, explode(',', $student->scores)))->toAssoc() : [];
     		// $student->scores= array_collapse($student->scores);
-
+            $student_scores = StudentScore::where('student_id',$student->id)
+                ->whereIn('section_score_id',$scores->pluck('id'))
+                ->get();
+            $student_scores = $student_scores->mapWithKeys(function($item){
+                    return [$item['section_score_id']=>$item['score']];
+                }
+            );
+            $student->scores = $student_scores;
     	}
 
     

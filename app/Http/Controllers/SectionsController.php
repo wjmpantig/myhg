@@ -89,16 +89,16 @@ class SectionsController extends Controller
 			->orderBy('date')
 			->get();
 		
-		$raw = "(select group_concat( section_attendances.id separator ',') from student_attendances 
-			join section_attendances on section_attendances.id = student_attendances.section_attendance_id
-			where student_attendances.student_id = users.id and is_present = 1 and section_attendances.deleted_at is null
-			group by student_id
-			order by date) as attendance
-		";
+		// $raw = "(select group_concat( section_attendances.id separator ',') from student_attendances 
+		// 	join section_attendances on section_attendances.id = student_attendances.section_attendance_id
+		// 	where student_attendances.student_id = users.id and is_present = 1 and section_attendances.deleted_at is null
+		// 	group by student_id
+		// 	order by date) as attendance
+		// ";
 
 		$students = DB::table('section_students')
-			->select('users.id as id','first_name','last_name',
-				DB::raw($raw)
+			->select('users.id as id','first_name','last_name'
+				// DB::raw($raw)
 			)
     		->leftJoin('users','student_id','=','users.id')
     		->leftJoin('sections','sections.id','=','users.id')
@@ -108,8 +108,16 @@ class SectionsController extends Controller
             ->whereNull('section_students.deleted_at')
     		->orderBy('last_name')
     		->get();
+
     	foreach($students as $student){
-    		$student->attendance = array_fill_keys(array_map('intval', explode(',', $student->attendance)),true);
+    		// $student->attendance = array_fill_keys(array_map('intval', explode(',', $student->attendance)),true);
+            $attendance = StudentAttendance::where('student_id',$student->id)
+                ->whereIn('section_attendance_id',$dates->pluck('id'))
+                ->get();
+            $attendance = $attendance->mapWithKeys(function($item){
+                return [$item['section_attendance_id']=>$item['is_present']];
+            });
+            $student->attendance = $attendance;
     	}
     
     	$data = new \stdClass();

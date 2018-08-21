@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         	SeasonsTableSeeder::class,
         	SectionsTableSeeder::class,
         	UsersTableSeeder::class,
-        	// SectionAttendancesTableSeeder::class,
+        	SectionAttendancesTableSeeder::class,
         	ScoreTypesTableSeeder::class
         ]);
         
