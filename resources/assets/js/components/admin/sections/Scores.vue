@@ -47,7 +47,7 @@
 					<tr>
 						<th>Total</th>
 						<th v-for="(score,index) in scores" class="has-text-centered">
-							<input type="text" v-bind:class="{input:true,'is-danger':errors.total[score.id]}" v-model="score.total" v-on:blur="updateTotal(score,index)" :disabled="score.isUpdating">
+							<input type="text" v-bind:class="{input:true,'is-danger':errors.total[score.id],'is-warning':score.total < 1}" v-model="score.total" v-on:blur="updateTotal(score,index)" :disabled="score.isUpdating">
 						</th>
 					</tr>
 					<tr>
@@ -65,7 +65,7 @@
 						<td>{{ student.last_name}}, {{ student.first_name}}</td>
 						<td v-for="(score) in scores" class="has-text-centered">
 							<input v-bind:class="{input:true, 'is-danger':errors.students[index] && errors.students[index][score.id]}" type="text" v-model="student.scores[score.id]" min="0" v-bind:max="score.total" v-on:blur="updateScore(score,student,index)" 
-							:disabled="student.update_status && student.update_status[index] && student.update_status[index][score.id]">
+							:disabled="score.total < 1 || student.update_status && student.update_status[index] && student.update_status[index][score.id]">
 						</td>
 					</tr>
 				</tbody>

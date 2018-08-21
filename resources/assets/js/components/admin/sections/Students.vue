@@ -14,7 +14,7 @@
 					<td>{{student.last_name}}, {{student.first_name}}</td>
 					<td class="has-text-centered">
 
-						<router-link :to="{path:'/students/'+student.id+'/transfer'}" class="has-text-danger">
+						<router-link :to="{path:'/students/'+student.student_id+'/transfer'}" class="has-text-danger">
 							<font-awesome-icon :icon="['fas','file-export']"></font-awesome-icon>		
 						</router-link>	
 					</td>
