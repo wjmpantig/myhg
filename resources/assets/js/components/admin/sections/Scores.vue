@@ -3,7 +3,7 @@
 		<form @submit.prevent="addScore">
 			<div class="field has-addons">
 				<div class="control has-icons-left">
-					<datepicker placeholder="New date" v-bind:input-class="{'input':true,'is-danger': new_date.error}" v-model="new_date.date" format="MMM dd yyyy"></datepicker>
+					<datepicker placeholder="New date" v-bind:input-class="{'input':true,'is-danger': new_date.errors.length>0}" v-model="new_date.date" format="MMM dd yyyy"></datepicker>
 					<span class="icon is-left">
 						<font-awesome-icon :icon="['far','calendar-alt']"></font-awesome-icon>
 					</span>
@@ -13,6 +13,9 @@
 					<button type="submit" class="button is-primary is-outlined">Add date</button>
 				</div>
 			</div>
+			<p class="help is-danger" v-show="new_date.errors.length > 0">
+				{{new_date.errors.length > 0 ? new_date.errors.join(". ") : ""}}
+			</p>
 			
 		</form>
 		<div class="message is-danger" v-show="Object.keys(errors.total).length || Object.keys(errors.students).length">
@@ -86,7 +89,7 @@
 				},
 				new_date:{
 					date:null,
-					error:null
+					errors:[]
 				}
 			};
 		},
@@ -227,7 +230,7 @@
 				}).catch(err=>{
 					if(err.response){
 						console.error(err.response.data.message);
-						this.new_date.error = err.response.data.errors['date'];
+						this.new_date.errors = err.response.data.errors['date'];
 					}else{
 						console.error(err);
 					}

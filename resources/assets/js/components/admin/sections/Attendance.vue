@@ -3,7 +3,7 @@
 		<form @submit.prevent="addAttendance">
 			<div class="field has-addons">
 				<div class="control has-icons-left">
-					<datepicker placeholder="New date" v-bind:input-class="{'input':true,'is-danger': new_date.error}" v-model="new_date.date" format="MMM dd yyyy"></datepicker>
+					<datepicker placeholder="New date" v-bind:input-class="{'input':true,'is-danger': new_date.errors.length>0}" v-model="new_date.date" format="MMM dd yyyy"></datepicker>
 					<span class="icon is-left">
 						<font-awesome-icon :icon="['far','calendar-alt']"></font-awesome-icon>
 					</span>
@@ -13,12 +13,13 @@
 					<button type="submit" class="button is-primary is-outlined">Add date</button>
 				</div>
 			</div>
+			<p class="help is-danger" v-show="new_date.errors.length > 0">
+				{{new_date_error}}
+			</p>
 			
 		</form>
 		
-		<p class="help is-danger" v-show="new_date.error">
-			{{new_date_error}}
-		</p>
+		
 		<div class="table-wrapper" v-show="dates.length > 0">
 			<table v-bind:class="{'table is-hoverable is-bordered is-striped': true,'is-fullwidth is-narrow':dates.length > 5}">				
 				<thead>
@@ -54,7 +55,7 @@ export default{
 			students:[],
 			new_date: {
 				date: null,
-				error: null
+				errors: []
 			}
 		}
 	},
@@ -64,8 +65,11 @@ export default{
 	computed:{
 		new_date_error(){
 
-			return this.new_date.error == null ? '' : this.new_date.error.join(' ');
-		}
+			return this.new_date.errors == null ? '' : this.new_date.errors.join(' ');
+		},
+		// disabled_dates(){
+		// 	foreach
+		// }
 	},
 	methods:{
 		togglePresent(student_id,section_attendance_id,value){
@@ -118,7 +122,7 @@ export default{
 			});
 		},
 		addAttendance(){
-			this.new_date.error = null;
+			this.new_date.errors = [];
 			let date = this.new_date.date;
 			// console.log(this.new_date);
 			if(date != null){
@@ -133,7 +137,7 @@ export default{
 			}).catch(err=>{
 				if(err.response){
 					console.error(err.response.data.message);
-					this.new_date.error = err.response.data.errors['date'];
+					this.new_date.errors = err.response.data.errors['date'];
 				}else{
 					console.error(err);
 				}
