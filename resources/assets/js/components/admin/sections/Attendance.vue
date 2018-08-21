@@ -19,31 +19,31 @@
 		<p class="help is-danger" v-show="new_date.error">
 			{{new_date_error}}
 		</p>
-			<div class="table-wrapper">
-				<table class="table is-hoverable is-bordered is-striped is-fullwidth">				
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th v-for="(date,index) in dates" class="has-text-centered">
-								<div>{{date.date | moment("MM/DD")}}</div>
-								<a @click="confirmDelete(date)" class="has-text-danger">
-									<font-awesome-icon :icon="['fas','times']"></font-awesome-icon>
-								</a>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="(student,index) in students">
-							<td>{{ student.last_name}}, {{ student.first_name}}</td>
-							<td v-for="(date,index) in dates" class="has-text-centered">
-								<input type="checkbox" v-model="student.attendance[date.id]" v-on:change="togglePresent(student.id,date.id,student.attendance[date.id])">
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+		<div class="table-wrapper" v-show="dates.length > 0">
+			<table v-bind:class="{'table is-hoverable is-bordered is-striped': true,'is-fullwidth is-narrow':dates.length > 5}">				
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th v-for="(date,index) in dates" class="has-text-centered">
+							<div>{{date.date | moment("MM/DD")}}</div>
+							<a @click="confirmDelete(date)" class="has-text-danger">
+								<font-awesome-icon :icon="['fas','times']"></font-awesome-icon>
+							</a>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(student,index) in students">
+						<td>{{ student.last_name}}, {{ student.first_name}}</td>
+						<td v-for="(date,index) in dates" class="has-text-centered">
+							<input type="checkbox" v-model="student.attendance[date.id]" v-on:change="togglePresent(student.id,date.id,student.attendance[date.id])">
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
+	
 </template>
 <script>
 
@@ -82,7 +82,9 @@ export default{
 			});
 		},
 		loadAttendance(){
-				axios.get('/api/sections/'+this.$route.params.id+'/attendance').then(response=>{
+			this.dates = [];
+			this.students = [];
+			axios.get('/api/sections/'+this.$route.params.id+'/attendance').then(response=>{
 				this.dates = response.data.dates;
 				this.students = response.data.students;
 			}).catch(err=>{

@@ -41,7 +41,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="table-wrapper">
+		<div class="table-wrapper" v-show="scores.length > 0">
 			<table v-bind:class="{'table is-hoverable is-bordered is-striped': true,'is-fullwidth is-narrow':scores.length > 5}">				
 				<thead>
 					<tr>
@@ -104,10 +104,11 @@
 		},
 		methods:{
 			loadScores(){
-				console.log();
+				this.scores = [];
+				this.students = [];
 				axios.get('/api/sections/'+this.$route.params.id+'/scores/'+this.$route.meta.type_id).then(response=>{
-				this.scores = response.data.scores;
-				this.students = response.data.students;
+					this.scores = response.data.scores;
+					this.students = response.data.students;
 				}).catch(err=>{
 					if(err.response){
 						console.error(err.response.data.message);
