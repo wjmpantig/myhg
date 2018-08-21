@@ -6,7 +6,7 @@
         <li><router-link to="/students">Students</router-link></li>
         <li><router-link to="/settings">Settings</router-link></li>      
         <li><a href="#" @click="logout()">Logout</a>
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hide">
+        <form id="logout-form" ref="logout_form" action="{{ route('logout') }}" method="POST" class="hide">
             @csrf
         </form>
         </li>

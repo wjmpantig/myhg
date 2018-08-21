@@ -26,15 +26,23 @@ class StudentsController extends Controller
     	// Log::debug($request->season_id);
     	$season = empty($request->season_id) ? Season::orderBy('created_at','desc')->first() : Season::findOrFail($request->season_id);
     	$student_type = UserType::where('name','Student')->first();
-    	$students  = User::select('users.id',DB::raw('concat(last_name,", ",first_name) as name'),'sections.name as section_name','season_id')
-    		->join('section_students','users.id','=','section_students.student_id')
-    		->join('sections','sections.id','=','section_students.section_id')
-			->where('user_type_id',$student_type->id)
-			->where('season_id',$season->id)
-            ->whereNull('section_students.deleted_at')
-			->orderBy('last_name');
-		// Log::debug($students->toSql());
-    	$students = $students->get();
+        $students  = User::select('users.id',DB::raw('concat(last_name,", ",first_name) as name'),'sections.name as section_name','season_id')
+            ->join('section_students','users.id','=','section_students.student_id')
+            ->join('sections','sections.id','=','section_students.section_id')
+            ->where('user_type_id',$student_type->id)
+            ->where('season_id',$season->id)
+            ->whereNull('section_students.deleted_at');
+
+        if(!empty(trim($request->q))){
+            $q = strtoupper(trim($request->q));
+            $students = $students->where(function($query) use ($q){
+                    $query->whereRaw('UPPER(first_name) LIKE ?',["%$q%"])
+                        ->orWhereRaw('UPPER(last_name) LIKE ?',["%$q%"]);
+                });
+
+        }
+
+    	$students = $students->orderBy('last_name')->paginate(20);
     	return $students;
     }
 

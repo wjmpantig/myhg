@@ -13,7 +13,18 @@
 				
 			</div>
 		</div>
-		<span>Total students: {{students.length}}</span>
+	
+		<div class="field is-grouped">
+			<div class="control">
+				<input type="text" class="input" placeholder="Search a name" v-model="search" v-debounce:300="loadStudents">
+			</div>
+		</div>
+	
+		<span>Total students: {{students.total}}</span>
+		<nav>
+			<a class="pagination-previous" v-show="students.current_page > 1" @click="prev()">Previous</a>
+			<a class="pagination-next"  v-show="students.current_page < students.last_page" @click="next()">Next</a>
+		</nav>
 		<table class="table is-bordered is-striped is-hoverable">
 			<thead>
 				<tr>
@@ -23,7 +34,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(student,index) in students">
+				<tr v-for="(student,index) in students.data">
 					<td><router-link :to="{path:'/students/'+ student.id}">{{student.name}}</router-link></td>
 					<td>{{student.section_name}}</td>
 					<td class="has-text-centered">
@@ -35,6 +46,10 @@
 				</tr>
 			</tbody>
 		</table>
+		<nav>
+			<a class="pagination-previous" v-show="students.current_page > 1" @click="prev()">Previous</a>
+			<a class="pagination-next"  v-show="students.current_page < students.last_page" @click="next()">Next</a>
+		</nav>
 	</div>
 </template>
 <script>
@@ -43,7 +58,10 @@
 			return {
 				season: {},
 				seasons: [],
-				students: []
+				students: [],
+				page:1,
+				search:null,
+				last_search:null
 			}
 		},
 		mounted(){
@@ -58,16 +76,30 @@
 		methods:{
 			loadStudents(){
 				this.students = [];
-				axios.get('/api/students/',{
+				if(this.last_search != this.search){
+					this.page = 1;
+				}
+				axios.get('/api/students',{
 					params:{
-						season_id: this.season
+						season_id: this.season,
+						page: this.page,
+						q:this.search
 					}
 				}).then(response=>{
 				// console.log(response.data);
 					this.students = response.data;
+					this.last_search = this.search;
 				}).catch(err=>{
 					console.error(err);
 				});
+			},
+			prev(){
+				this.page--;
+				this.loadStudents();
+			},
+			next(){
+				this.page++;
+				this.loadStudents();
 			}
 		}
 	}

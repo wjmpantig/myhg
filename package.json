@@ -21,6 +21,7 @@
         "lodash": "^4.17.4",
         "popper.js": "^1.12",
         "vue": "^2.5.7",
+        "vue-debounce": "^0.2.0",
         "vue-moment": "^4.0.0",
         "vue-router": "^3.0.1",
         "vuejs-datepicker": "^1.5.2",

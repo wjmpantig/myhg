@@ -20,6 +20,7 @@ require('./bootstrap');
 window.Vue = require('vue');
 import VuejsDialog from 'vuejs-dialog';
 import VueRouter from 'vue-router';
+import vueDebounce from 'vue-debounce'
 import Datepicker from 'vuejs-datepicker';
 
 window.VueResource = require('vue-resource');
@@ -27,6 +28,7 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('datepicker',Datepicker);
 Vue.use(VueRouter);
 Vue.use(VuejsDialog);
+Vue.use(vueDebounce);
 Vue.use(require('vue-moment'));
 
 
@@ -50,8 +52,9 @@ const app = new Vue({
 	},
 	methods:{
 		logout(){
-			$('#logout-form').submit()
-			
+			// $('#logout-form').submit()
+			this.$refs['logout_form'].submit();
+			// console.log();
 		}
 	},
 	
