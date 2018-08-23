@@ -116,7 +116,6 @@ class SectionsController extends Controller
     		->get();
 
     	foreach($students as $student){
-    		// $student->attendance = array_fill_keys(array_map('intval', explode(',', $student->attendance)),true);
             $attendance = StudentAttendance::where('student_id',$student->id)
                 ->whereIn('section_attendance_id',$dates->pluck('id'))
                 ->get();

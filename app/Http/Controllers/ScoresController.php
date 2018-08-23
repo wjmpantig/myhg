@@ -58,9 +58,10 @@ class ScoresController extends Controller
     		->whereNull('users.deleted_at')
     		->whereNull('sections.deleted_at')
             ->whereNull('section_students.deleted_at')
-    		->orderBy('last_name');
+    		->orderBy('last_name')
+            ->get();
     	// Log::debug($students->toSql());
-		$students = $students->get();    		
+		// $students = $students->get();    		
     		
 
     	foreach($students as $student){
