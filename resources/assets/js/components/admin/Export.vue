@@ -58,6 +58,16 @@
 		
 				
 			</div>
+			<div class="columns ">
+				
+				<div class="column is-narrow">
+					<label class="label">Total</label>
+				</div>
+				<div class="column is-narrow">
+					<span :class="{'has-text-danger has-text-weight-bold': total !=100}">{{total}}</span>
+				</div>
+			
+			</div>
 			<div class="columns is-multiline ">
 				<div class="column is-narrow">
 					<div class="columns">
@@ -96,16 +106,7 @@
 				</div>
 			
 			</div>
-			<div class="columns ">
-				
-				<div class="column is-narrow">
-					<label class="label">Total</label>
-				</div>
-				<div class="column is-narrow">
-					<input :class="{'input':true,'is-danger':total!=100}" type="text" placeholder="" v-model="total" readonly="readonly">		
-				</div>
 			
-			</div>
 			<button class="button is-primary" type="submit">Export</button>
 			<a class="button is-info" :href="fileLink" v-show="file">Download</a>
 		</form>

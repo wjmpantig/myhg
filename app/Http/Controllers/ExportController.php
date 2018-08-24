@@ -116,7 +116,7 @@ class ExportController extends Controller
 		$dates = $dates->mapWithKeys(function($item){
 				return [$item['id']=>Carbon::parse($item['date'])];
 		});
-
+		Log::debug($dates);
 
     	foreach($students as $student){
             $attendance = StudentAttendance::where('student_id',$student->id)
@@ -151,11 +151,12 @@ class ExportController extends Controller
     		$col=1;
 			$sheet->setCellValueByColumnAndRow($col++,$row,$student->name);
 			$attendance = $student->attendance;
+			Log::debug($attendance);
     		foreach($dates as $id=>$date){
     			$val = $attendance->get($id);
-    			if($val){
+    			// if($val){
 					$sheet->setCellValueByColumnAndRow($col,$row,$val);
-				}
+				// }
 				$col++;
     		}
     		$formula = sprintf("=SUM(%s:%s)",LookupRef::cellAddress($row,$col-$dates->count(),2,true),LookupRef::cellAddress($row,$col-1,2,true));
@@ -338,9 +339,9 @@ class ExportController extends Controller
     				}
 		    		// Log::debug($formula);
 			        $sheet->setCellValueByColumnAndRow($col,$row,$formula);
-			        $sheet->getStyleByColumnAndRow($col,$row-1)
-	    			->getNumberFormat()
-	    			->setFormatCode(NumberFormat::FORMAT_PERCENTAGE);
+			        $sheet->getStyleByColumnAndRow($col,$row)
+	    				->getNumberFormat()
+	    				->setFormatCode(NumberFormat::FORMAT_PERCENTAGE);
     			}else if(strcmp($slug,str_slug('Remarks')) == 0){
     				$grade_pass_formula = sprintf('%s>=%s',LookupRef::cellAddress($row,$col-1,1,true),$passing_grade_cell);
     				if($pass_finals){

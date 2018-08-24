@@ -22,6 +22,8 @@ Route::middleware('auth:api')->group(function(){
 	Route::get('seasons/latest','SeasonsController@latest');
 	Route::get('user_types','UserTypesController@all');
 	Route::get('score_types/','ScoresController@score_types');
+	Route::get('score_types/{id}','ScoresController@score_types');
+
 
 	Route::get('sections','SectionsController@all');
 	Route::get('sections/{id}','SectionsController@get');
