@@ -17,6 +17,7 @@ use App\StudentAttendance;
 use App\StudentScore;
 use App\ScoreType;
 use App\ExportFile;
+use Auth;
 use DB;
 use Log;
 class ExportController extends Controller
