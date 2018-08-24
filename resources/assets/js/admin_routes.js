@@ -69,6 +69,10 @@ module.exports={
 		component:require('./components/admin/users/CreateUser.vue')
 	},
 	{
+		path:'/export/',
+		component:require('./components/admin/Export.vue')
+	},
+	{
 		path:'*',
 		component:require('./components/404.vue')
 	},

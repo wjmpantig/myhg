@@ -21,11 +21,13 @@ Route::middleware('auth:api')->group(function(){
 	Route::get('seasons','SeasonsController@all');
 	Route::get('seasons/latest','SeasonsController@latest');
 	Route::get('user_types','UserTypesController@all');
+	Route::get('score_types/','ScoresController@score_types');
 
 	Route::get('sections','SectionsController@all');
 	Route::get('sections/{id}','SectionsController@get');
 	Route::post('sections/{id}','SectionsController@update');
 	Route::delete('sections/{id}','SectionsController@delete');
+
 
 	Route::get('sections/{id}/students','SectionsController@students');
 	Route::get('sections/{id}/attendance','SectionsController@attendance');
@@ -34,7 +36,6 @@ Route::middleware('auth:api')->group(function(){
 	Route::delete('sections/{id}/attendance/{section_attendance_id}','SectionsController@deleteAttendance');
 
 
-	Route::get('score_types/{id}','ScoresController@score_types');
 	Route::get('sections/{id}/scores/{type_id}','ScoresController@scores');
 	Route::put('sections/{section_id}/scores/{type_id}','ScoresController@addScore');
 	Route::delete('sections/{section_id}/scores/{type_id}/{score_id}','ScoresController@deleteScore');
@@ -52,4 +53,6 @@ Route::middleware('auth:api')->group(function(){
 	Route::post('user/password','UsersController@update_password');
 
 	Route::post('users/','UsersController@create');
+
+	Route::post('export','ExportController@export');
 });

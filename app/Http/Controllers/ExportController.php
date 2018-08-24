@@ -16,6 +16,7 @@ use App\SectionScore;
 use App\StudentAttendance;
 use App\StudentScore;
 use App\ScoreType;
+use App\ExportFile;
 use DB;
 use Log;
 class ExportController extends Controller
@@ -24,13 +25,42 @@ class ExportController extends Controller
 	// private $spreadsheet = null;
 	public function __construct()
     {
-        // $this->middleware('auth');
+        $this->middleware('auth');
+    }
+
+    public function get(Request $request){
+
+    	$file = ExportFile::findOrFail($request->id);
+
+		Log::info(sprintf("user %d downloaded file %d",Auth::user()->id,$file->id));
+		return response()->file($file->filename);
     }
 
     public function export(Request $request){
     	$request->validate([
-    		'id'=>'required|exists:sections,id'
+    		'id'=>'required|exists:sections,id',
+    		'passing_grade'=>'required|numeric|between:0,100',
+    		'pass_finals'=>'required|boolean',
+    		'pass_finals_grade'=>'numeric|between:0,100',
+    		'criteria.attendance'=>'required|numeric|between:0,100',
+    		'criteria.homework'=>'required|numeric|between:0,100',
+    		'criteria.quiz'=>'required|numeric|between:0,100',
+    		'criteria.final-exam'=>'required|numeric|between:0,100',
+    		'criteria.teachers-grade'=>'required|numeric|between:0,100',
+    		'criteria'=>[
+    			function($attr,$val,$fail){
+    				// Log::debug($attr,collect((array)$val));
+    				$total = 0;
+    				foreach($val as $k=>$v){
+    					$total += $v;
+    				}
+    				if($total != 100){
+    					return $fail($attr . ' is invalid');
+    				}
+    			}
+    		]
     	]);
+    	
     	$id = $request->id;
     	$section = Section::findOrFail($id);
 
@@ -46,18 +76,30 @@ class ExportController extends Controller
     		->get();
 
     	$spreadsheet = new Spreadsheet();
+    	$summary_sheet = $spreadsheet->getActiveSheet();
+    	$summary_sheet->setTitle('Summary');
     	$this->createAttendanceSheet($spreadsheet,$id,$students);
     	$this->createScoreSheets($spreadsheet,$id,$students);
-    	
+    	$this->createSummarySheet($summary_sheet,$id,$students,
+    		$request->criteria,
+    		$request->passing_grade,
+    		$request->pass_finals,
+    		$request->pass_finals_grade
+    	);
+    	$spreadsheet->setActiveSheetIndexByName('Summary');
     	$time = Carbon::now();
 		$filename = sprintf("%s-%s.xlsx",$section->name,$time->format("Y-m-d-U"));
-		$filename = "test.xlsx";
+		// $filename = "test.xlsx";
 		// return $filename;
-		
+		$filename = storage_path('app/public/'.$filename);
+		$file = new ExportFile();
+		$file->filename = $filename;
+		$file->save();
     	$writer = new Xlsx($spreadsheet);
-		$writer->save(storage_path('app/public/'.$filename));
-		$out = is_null($this->debug) ? 'complete' : $this->debug;
-    	return $out;
+		$writer->save($filename);
+		// $out = is_null($this->debug) ? 'complete' : $this->debug;
+		Log::info(sprintf("user %d created file %d",Auth::user()->id,$file->id));
+    	return $file;
     }
 
     private function createAttendanceSheet($spreadsheet,$section_id,$students){
@@ -85,7 +127,7 @@ class ExportController extends Controller
             $student->attendance = $attendance;
     	}
 		// $this->debug = $students;
-    	$row = 1;
+    	$row = 2;
     	$col = 1;
 
     	$sheet->setCellValueByColumnAndRow($col++,$row,"Name");
@@ -118,6 +160,10 @@ class ExportController extends Controller
     		$formula = sprintf("=SUM(%s:%s)",LookupRef::cellAddress($row,$col-$dates->count(),2,true),LookupRef::cellAddress($row,$col-1,2,true));
     		$sheet->setCellValueByColumnAndRow($col++,$row,$formula);
     		$formula = sprintf("=%s/%s",LookupRef::cellAddress($row,$col-1,2,true),LookupRef::cellAddress($total[1],$total[0],2,true));
+    		if(!isset($student->summary)){
+    			$student->summary = [];
+    		}
+    		$student->summary[str_slug('attendance')] = LookupRef::cellAddress($row,$col,1,true,$sheet->getTitle());
     		$sheet->setCellValueByColumnAndRow($col,$row,$formula);
     		$sheet->getStyleByColumnAndRow($col,$row)
     			->getNumberFormat()
@@ -193,7 +239,6 @@ class ExportController extends Controller
 				$col++;
     		}
 		
-
     		
     		if($scores->count() == 1){
     			$formula = sprintf("=%s/%s",LookupRef::cellAddress($row,$col-1,2,true),LookupRef::cellAddress($total[1],$total[0],2,true));
@@ -201,6 +246,7 @@ class ExportController extends Controller
 	    		$sheet->getStyleByColumnAndRow($col,$row)
 	    			->getNumberFormat()
 	    			->setFormatCode(NumberFormat::FORMAT_PERCENTAGE);
+
     		}else{
     			$formula = sprintf("=SUM(%s:%s)",LookupRef::cellAddress($row,$col-$scores->count(),2,true),LookupRef::cellAddress($row,$col-1,2,true));
     			$sheet->setCellValueByColumnAndRow($col++,$row,$formula);
@@ -211,20 +257,118 @@ class ExportController extends Controller
 	    			->setFormatCode(NumberFormat::FORMAT_PERCENTAGE);
 
     		}
+
+    		if(!isset($student->summary)){
+    			$student->summary = [];
+    		}
+    		$student->summary[str_slug($type->name)] = LookupRef::cellAddress($row,$col,1,true,$sheet->getTitle());
+
     		$row++;
     	}
 
     }
 
-    private function createTeacherGradeSheet($spreadsheet,$section_id,$students){
-    	$sheet_name = "Teacher's Grade";
-    	$sheet = new Worksheet($spreadsheet,$sheet_name);
+    
 
-    	$spreadsheet->addSheet($sheet);
-		$spreadsheet->setActiveSheetIndexByName($sheet_name);
-		$row = 2;
+    private function createSummarySheet($sheet,$section_id,$students,$criterias,$passing_grade,$pass_finals,$pass_finals_grade){
+    	$row = 2;
     	$col = 1;
-    	$sheet->setCellValueByColumnAndRow($col,$row-1,"Total");
+    	$columns = ['Attendance','Homework','Quiz','Teacher\'s Grade','Final Exam','Final Grade','Remarks'];
+    	if($pass_finals){
+    		array_splice($columns,5,0,['Passed Final Exam']);
+    	}
+    	$passing_grade_cell = null;
+    	$pass_final_cell = null;
     	$sheet->setCellValueByColumnAndRow($col++,$row,"Name");
+        foreach($columns as $column){
+        	$slug = str_slug($column);
+			$percent = isset($criterias[$slug]);
+			if($percent){
+				$percent = $criterias[$slug];
+				$criterias[$slug] = [
+					'value'=>$percent,
+					'ref'=>LookupRef::cellAddress($row-1,$col,4,true)
+				];
+				$sheet->setCellValueByColumnAndRow($col,$row-1,$percent/100);
+				$sheet->getStyleByColumnAndRow($col,$row-1)
+	    			->getNumberFormat()
+	    			->setFormatCode(NumberFormat::FORMAT_PERCENTAGE);
+			}else if(strcmp(str_slug($column),str_slug('Final Grade'))==0){
+				$sheet->setCellValueByColumnAndRow($col,$row-1,$passing_grade/100);
+				$passing_grade_cell = LookupRef::cellAddress($row-1,$col,4,true);
+				$sheet->getStyleByColumnAndRow($col,$row-1)
+	    			->getNumberFormat()
+	    			->setFormatCode(NumberFormat::FORMAT_PERCENTAGE);
+			}else if(strcmp(str_slug($column),str_slug('Passed Final Exam'))==0){
+				$sheet->setCellValueByColumnAndRow($col,$row-1,$pass_finals_grade/100);
+				$pass_final_cell = LookupRef::cellAddress($row-1,$col,4,true);
+				$sheet->getStyleByColumnAndRow($col,$row-1)
+	    			->getNumberFormat()
+	    			->setFormatCode(NumberFormat::FORMAT_PERCENTAGE);
+			}
+        	$sheet->setCellValueByColumnAndRow($col++,$row,$column);
+        }
+        $row++;
+    	foreach($students as $student){
+    		$col=1;
+    		$sheet->setCellValueByColumnAndRow($col++,$row,$student->name);
+    		foreach($columns as $column){
+    			$slug = str_slug($column);
+    			
+    			if(strcmp($slug,str_slug('Teacher\'s Grade') )== 0){
+			        $sheet->setCellValueByColumnAndRow($col,$row,0);
+			        $sheet->getStyleByColumnAndRow($col,$row)
+    					->getNumberFormat()
+    					->setFormatCode(NumberFormat::FORMAT_PERCENTAGE);
+
+    			}else if(strcmp($slug,str_slug('Passed Final Exam') )== 0){
+    				$formula = sprintf('=IF(%s>=%s,"PASSED","FAIL")',$student->summary_sheet_cells[str_slug('Final Exam')],$pass_final_cell);
+			        $sheet->setCellValueByColumnAndRow($col,$row,$formula);
+
+    			}else if(strcmp($slug,str_slug('Final Grade')) == 0){
+    				$formula = '=';
+    				$count = 0;
+    				foreach($criterias as $criteria=>$val){
+    					if($count >0){
+    						$formula .='+';
+    					}
+    					$formula .= sprintf("(%s*%s)",$student->summary_sheet_cells[$criteria],$val['ref']);
+    					$count++;
+    				}
+		    		// Log::debug($formula);
+			        $sheet->setCellValueByColumnAndRow($col,$row,$formula);
+			        $sheet->getStyleByColumnAndRow($col,$row-1)
+	    			->getNumberFormat()
+	    			->setFormatCode(NumberFormat::FORMAT_PERCENTAGE);
+    			}else if(strcmp($slug,str_slug('Remarks')) == 0){
+    				$grade_pass_formula = sprintf('%s>=%s',LookupRef::cellAddress($row,$col-1,1,true),$passing_grade_cell);
+    				if($pass_finals){
+    					$formula = sprintf('=IF(OR(%s="PASSED",%s),"PASSED","FAIL")',$student->summary_sheet_cells[str_slug('Passed Final Exam')],$grade_pass_formula);
+    				}else{
+	    				$formula = sprintf('=IF(%s,"PASSED","FAIL")',$grade_pass_formula) ;
+	    			}
+		    			// Log::debug($cell);
+		        	$sheet->setCellValueByColumnAndRow($col,$row,$formula);
+    			}else{
+    				$cell = isset($student->summary[$slug]) ? $student->summary[$slug] : null;
+	    			if($cell){
+		    			$formula = sprintf("=%s",$cell);
+		    			// Log::debug($cell);
+			        	$sheet->setCellValueByColumnAndRow($col,$row,$formula);
+			        	$sheet->getStyleByColumnAndRow($col,$row)
+	    					->getNumberFormat()
+	    					->setFormatCode(NumberFormat::FORMAT_PERCENTAGE);
+			        }
+    			}
+    			if(!isset($student->summary_sheet_cells)){
+	    			$student->summary_sheet_cells = [];
+	    		}
+	    		$student->summary_sheet_cells[$slug] = LookupRef::cellAddress($row,$col,1,true);
+    			
+    			$col++;
+	        }
+    		$row++;
+
+    	}
     }
 }
