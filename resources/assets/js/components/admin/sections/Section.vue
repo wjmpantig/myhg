@@ -4,11 +4,11 @@
 		<div class="tabs">
 			<ul>
 		
-				<router-link tag="li" :to="{path:'/sections/' + section.id }" active-class="is-active" exact><a>Students</a></router-link>
-				<router-link tag="li" :to="{path:'/sections/' + section.id + '/attendance'}" class="tabs-title" active-class="is-active"  exact><a>Attendance</a></router-link>
-				<router-link tag="li" :to="{path:'/sections/' + section.id + '/homeworks'}" class="tabs-title" active-class="is-active" exact><a>Homeworks</a></router-link>
-				<router-link tag="li" :to="{path:'/sections/' + section.id + '/quizzes'}" class="tabs-title" active-class="is-active" exact><a>Quizzes</a></router-link>
-				<router-link tag="li" :to="{path:'/sections/' + section.id + '/finals'}" class="tabs-title" active-class="is-active" exact><a>Final Exam</a></router-link>
+				<router-link tag="li" :to="{path:'/sections/' + id }" active-class="is-active" exact><a>Students</a></router-link>
+				<router-link tag="li" :to="{path:'/sections/' + id + '/attendance'}" class="tabs-title" active-class="is-active"  exact><a>Attendance</a></router-link>
+				<router-link tag="li" :to="{path:'/sections/' + id + '/homeworks'}" class="tabs-title" active-class="is-active" exact><a>Homeworks</a></router-link>
+				<router-link tag="li" :to="{path:'/sections/' + id + '/quizzes'}" class="tabs-title" active-class="is-active" exact><a>Quizzes</a></router-link>
+				<router-link tag="li" :to="{path:'/sections/' + id + '/finals'}" class="tabs-title" active-class="is-active" exact><a>Final Exam</a></router-link>
 			</ul>
 		</div>
 		<router-view :key="$route.path"></router-view>	
@@ -19,6 +19,7 @@
 	export default{
 		data(){
 			return {
+				id: null,
 				section: {
 
 				}
@@ -26,6 +27,7 @@
 		},
 		mounted(){
 			let v = this;
+			this.id = this.$route.params.id;
 			axios.get('/api/sections/'+this.$route.params.id).then(response=>{
 				// console.log(response);
 				v.section = response.data;

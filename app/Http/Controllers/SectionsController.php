@@ -101,7 +101,7 @@ class SectionsController extends Controller
 		// 	group by student_id
 		// 	order by date) as attendance
 		// ";
-
+        Log::debug($dates);
 		$students = DB::table('section_students')
 			->select('users.id as id','first_name','last_name'
 				// DB::raw($raw)
@@ -124,6 +124,7 @@ class SectionsController extends Controller
             });
             $student->attendance = $attendance;
     	}
+        Log::debug($students);
     
     	$data = new \stdClass();
     	$data->dates = $dates;
