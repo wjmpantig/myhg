@@ -101,7 +101,7 @@ class SectionsController extends Controller
 		// 	group by student_id
 		// 	order by date) as attendance
 		// ";
-        Log::debug($dates);
+        // Log::debug($dates);
 		$students = DB::table('section_students')
 			->select('users.id as id','first_name','last_name'
 				// DB::raw($raw)
@@ -120,11 +120,11 @@ class SectionsController extends Controller
                 ->whereIn('section_attendance_id',$dates->pluck('id'))
                 ->get();
             $attendance = $attendance->mapWithKeys(function($item){
-                return [$item['section_attendance_id']=>$item['is_present']];
+                return [$item['section_attendance_id']=>$var = filter_var($item['is_present'], FILTER_VALIDATE_BOOLEAN)];
             });
             $student->attendance = $attendance;
     	}
-        Log::debug($students);
+        // Log::debug($students);
     
     	$data = new \stdClass();
     	$data->dates = $dates;
