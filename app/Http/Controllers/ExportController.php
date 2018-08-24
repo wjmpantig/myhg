@@ -116,7 +116,7 @@ class ExportController extends Controller
 		$dates = $dates->mapWithKeys(function($item){
 				return [$item['id']=>Carbon::parse($item['date'])];
 		});
-		Log::debug($dates);
+		// Log::debug($dates);
 
     	foreach($students as $student){
             $attendance = StudentAttendance::where('student_id',$student->id)
@@ -151,7 +151,7 @@ class ExportController extends Controller
     		$col=1;
 			$sheet->setCellValueByColumnAndRow($col++,$row,$student->name);
 			$attendance = $student->attendance;
-			Log::debug($attendance);
+			// Log::debug($attendance);
     		foreach($dates as $id=>$date){
     			$val = $attendance->get($id);
     			// if($val){
@@ -198,7 +198,7 @@ class ExportController extends Controller
 			]];
 		});
 	
-    	$this->debug = $students;
+    	// $this->debug = $students;
 		foreach($students as $student){
             $student_scores = StudentScore::where('student_id',$student->id)
                 ->whereIn('section_score_id',$scores->keys())
