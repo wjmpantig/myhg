@@ -17,7 +17,10 @@ class SectionScoresTableSeeder extends Seeder
     {
     	Carbon::useMonthsOverflow(false);
         $date = Carbon::createFromDate(2018,6,16);
-        $date->subWeeks(34);
+         if(!App::environment(['production','staging'])){
+            $date->subWeeks(34);
+        }
+        // $date->subWeeks(34);
         $homework_type = ScoreType::where('name','Homework')->first();
         $quiz_type = ScoreType::where('name','Quiz')->first();
         $exam_type = ScoreType::where('name','Final Exam')->first();
