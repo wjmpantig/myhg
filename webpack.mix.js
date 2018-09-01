@@ -11,8 +11,20 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.js(	'resources/assets/js/admin_app.js','public/js').sourceMaps();
-mix.js('resources/assets/js/login_app.js','public/js').sourceMaps();
+mix.js(	'resources/assets/js/admin_app.js','public/js')
+	.extract([
+		'axios',
+		'vue',
+		'vue-moment',
+		'vuejs-datepicker',
+		'vue-router',
+		'vuejs-dialog',
+		'vue-resource',
+		'@fortawesome/vue-fontawesome',
+		'vue-debounce',
+		])
+	.sourceMaps();
+// mix.js('resources/assets/js/login_app.js','public/js').sourceMaps();
 mix.sass('resources/assets/sass/app.scss', 'public/css')
    .browserSync({
    		proxy: 'myhg.local'

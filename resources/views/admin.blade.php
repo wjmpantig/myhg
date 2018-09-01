@@ -21,7 +21,7 @@
                 <div class="column is-one-fifth">
                     @include('admin.menu')
                 </div>
-                 <div class="column">
+                 <div class="column is-four-fifths">
                     <router-view></router-view>
                 </div>
             </div>
@@ -34,6 +34,8 @@
 </div>
 @endsection
 @section('scripts')            
-        <script src="js/admin_app.js"></script>
+        <script src="{{mix('js/manifest.js')}}"></script>
+        <script src="{{mix('js/vendor.js')}}"></script>
+        <script src="{{mix('js/admin_app.js')}}"></script>
 
 @endsection
