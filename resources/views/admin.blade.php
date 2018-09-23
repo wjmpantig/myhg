@@ -7,11 +7,11 @@
             <a href="/" class="navbar-item">
                 <h1 class="title">{{ config('app.name', 'MyHG') }}</h1>                
             </a>
-            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <!-- <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
               <span aria-hidden="true"></span>
               <span aria-hidden="true"></span>
               <span aria-hidden="true"></span>
-            </a>
+            </a> -->
         </div>
     </nav>
     <section class="section">

@@ -269,7 +269,7 @@ class StudentsController extends Controller
                 }
                 $s = StudentScore::where('student_id',$id)
                     ->where('section_score_id',$score['id'])->first();
-                if($s){
+                if(!$s){
                     $s = new StudentScore();
                     $s->section_score_id = $score['id'];
                     $s->student_id=$id;
