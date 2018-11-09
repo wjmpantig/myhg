@@ -13,7 +13,7 @@ class SectionsTableSeeder extends Seeder
     public function run()
     {
     	$seasons = Season::all();
-        $names = ['B1','B2','B3','B4','B5','Intermediate','Advanced'];
+        $names = ['B1','B2','B3','B4','B5','INT1','INT2','ADV'];
         foreach($seasons as $season){
         	foreach($names as $name){
         		$section = new Section();

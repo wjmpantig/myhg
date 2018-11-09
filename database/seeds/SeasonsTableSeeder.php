@@ -11,10 +11,10 @@ class SeasonsTableSeeder extends Seeder
      */
     public function run()
     {
-        $names = ['16th', '17th','18th'];
-        if(App::environment(['production','staging'])){
-            $names = ['18th'];
-        }
+        // $names = ['16th', '17th','18th'];
+        // if(App::environment(['production','staging'])){
+            $names = ['19th'];
+        // }
         foreach($names as $name){
         	$season = new Season();
         	$season->name=$name;

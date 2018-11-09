@@ -9,6 +9,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PDF;
 use Carbon\Carbon;
 use App\Section;
 use App\SectionAttendance;
@@ -372,5 +373,279 @@ class ExportController extends Controller
     		$row++;
 
     	}
+    }
+    public function pdf(Request $request){
+        // $request->validate([
+        //     'id'=>'required|exists:sections,id',
+        //     'start_date'=>'required|date_format:Y-m-d',
+        //     'weeks'=>'required|numeric|min:1'
+        // ]);
+        $section = Section::findOrFail($request->id);
+        $id= $request->id;
+        $start_date = Carbon::now();
+        $labels = array();
+        $weeks = 16;
+        $days = array();
+        $month = $start_date->month;
+
+        for($i = 0; $i< $weeks;$i++){
+            $day = $start_date->format('m/d');
+            $days[] = $day;
+            $start_date->addWeek();
+            if($start_date->month != $month || $i+1 == $weeks){
+                $start_date->subMonth();
+                $labels[$start_date->format('F')] = $days;
+                $days = array();
+                $start_date->addMonth();
+                $month = $start_date->month;
+            }
+        }
+
+        // Log::debug($labels);
+
+        $students = DB::table('section_students')
+            ->select('users.id as id',DB::raw('CONCAT(last_name,", ",first_name) as name'))
+            ->leftJoin('users','student_id','=','users.id')
+            ->leftJoin('sections','sections.id','=','users.id')
+            ->where('section_id',$id)
+            ->whereNull('users.deleted_at')
+            ->whereNull('sections.deleted_at')
+            ->whereNull('section_students.deleted_at')
+            ->orderBy('last_name')
+            ->get();
+        $data = [
+            'students'=>$students,
+            'labels'=>$labels,
+            'weeks'=>$weeks
+        ];
+        $pdf = PDF::loadView('pdf.attendance',$data);
+        $pdf->save(storage_path('test.pdf'));
+        // return $pdf->download('attendance-'.$section->name.'.pdf');
+        return view('pdf.attendance',$data);
+    }
+    public function createPrintFile(Request $request){
+        $request->validate([
+            'id'=>'required|exists:sections,id',
+            // 'start_date'=>'required|date_format:Y-m-d',
+            'weeks'=>'required|numeric|min:1'
+        ]);
+        $section = Section::findOrFail($request->id);
+        $id= $request->id;
+        $weeks = $request->weeks;
+        $students = DB::table('section_students')
+            ->select('users.id as id',DB::raw('CONCAT(last_name,", ",first_name) as name'))
+            ->leftJoin('users','student_id','=','users.id')
+            ->leftJoin('sections','sections.id','=','users.id')
+            ->where('section_id',$id)
+            ->whereNull('users.deleted_at')
+            ->whereNull('sections.deleted_at')
+            ->whereNull('section_students.deleted_at')
+            ->orderBy('last_name')
+            ->get();
+        $spreadsheet = new Spreadsheet();
+        $attendance_sheet = $spreadsheet->getActiveSheet();
+        
+        $this->createPrintAttendanceSheet($attendance_sheet,$students,$section,$weeks);
+        $perf_sheet = new Worksheet($spreadsheet);
+        $spreadsheet->addSheet($perf_sheet);
+        $this->createRecordSheet($perf_sheet,$students,$section,$weeks);
+        $time = Carbon::now();
+        $filename = sprintf("print_%s-%s.xlsx",$section->name,$time->format("Y-m-d-U"));
+        // $filename = "test.xlsx";
+        // return $filename;
+        $filename = storage_path('app/public/'.$filename);
+        $file = new ExportFile();
+        $file->filename = $filename;
+        $file->save();
+        $writer = new Xlsx($spreadsheet);
+        // $writer = new \PhpOffice\PhpSpreadsheet\Writer\Pdf\Dompdf($spreadsheet);
+        $writer->save($filename);
+        // $out = is_null($this->debug) ? 'complete' : $this->debug;
+        Log::info(sprintf("user %d created file %d",Auth::user()->id,$file->id));
+        return $file;
+    }
+
+    private function createPrintAttendanceSheet($sheet,$students,$section,$weeks){
+        $sheet->setTitle('Attendance');
+        $row = 1;
+        $startPrintAreaRow = 1;
+        $set =0;
+        $col = 1;
+        $sheet->setCellValueByColumnAndRow($col,$row,$section->name." Class Attendance");
+        $sheet->getStyleByColumnAndRow($col,$row)
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setRGB('20478c');
+        $sheet->getStyleByColumnAndRow($col,$row)->getFont()->getColor()->setRGB('FFFFFF');
+        $sheet->getStyleByColumnAndRow($col,$row)->getFont()->setBold(true);
+        $sheet->getStyleByColumnAndRow($col,$row)->getFont()->setSize(36);
+        $sheet->mergecellsByColumnAndRow($col,$row,$col+$weeks,$row);
+        $row = 2;
+        // $sheet->setCellValueByColumnAndRow($col,$row,"Period/Time");
+
+        // $row = 5;
+
+        $ctr = 0;
+        // $date = Carbon::parse($request->start_date);
+        $sheet->getPageSetup()->clearPrintArea();
+        foreach($students as $student){
+            if($ctr %15 == 0){
+                $set++;
+                if($set == 2){
+                    // $sheet->getPageSetup()-> addPrintAreaByColumnAndRow(1,$startPrintAreaRow,$weeks+1,$row);
+                    $set =0;
+                    $startPrintAreaRow = $row+2;
+                }
+                $this->createDateHeader($sheet,$row,$weeks);
+                // $row +=2;
+
+                $row++;
+            }
+            // $name = sprintf('%s, %s',$student->last_name,$student->first_name);
+            $sheet->setCellValueByColumnAndRow($col,$row,$student->name);
+            $sheet->getStyleByColumnAndRow($col,$row)->getFont()->setSize(18);
+            if($ctr % 2 == 0){
+                //style
+                $sheet->getStyleByColumnAndRow($col,$row,$col+$weeks,$row)->getFill()
+                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setRGB('d9d9d9');
+            }
+
+            // $ctr = ($ctr+1) %15;
+            $ctr++;
+            $row++;
+        }
+        $sheet->getStyleByColumnAndRow($col,1,$col+$weeks,$row-1)->applyFromArray([
+            'borders'=>[
+                'allBorders'=>[
+                    'borderStyle'=>\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color'=>['rgb'=>'000000']
+                ]
+            ]
+        ]);
+        $sheet->getColumnDimension('A')->setAutosize(true);
+        $sheet->getPageMargins()->setTop(0.25);
+        $sheet->getPageMargins()->setRight(0.25);
+        $sheet->getPageMargins()->setLeft(0.25);
+        $sheet->getPageMargins()->setBottom(0.25);
+        $sheet->getPageSetup()
+            ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
+        $sheet->getPageSetup()->setFitToWidth(1);
+        $sheet->getPageSetup()->setFitToHeight(0);
+    }
+
+    private function createRecordSheet($sheet,$students,$section,$weeks){
+        $sheet->setTitle('Performance');
+        $row = 1;
+        $startPrintAreaRow = 1;
+        $set =0;
+        $col = 1;
+        $sheet->setCellValueByColumnAndRow($col,$row,$section->name." Class Performance");
+        $sheet->getStyleByColumnAndRow($col,$row)
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setRGB('b52026');
+        $sheet->getStyleByColumnAndRow($col,$row)->getFont()->getColor()->setRGB('FFFFFF');
+        $sheet->getStyleByColumnAndRow($col,$row)->getFont()->setBold(true);
+        $sheet->getStyleByColumnAndRow($col,$row)->getFont()->setSize(36);
+        $sheet->mergecellsByColumnAndRow($col,$row,$col+$weeks,$row);
+        $row = 2;
+
+        $ctr = 0;
+        // $date = Carbon::parse($request->start_date);
+        $sheet->getPageSetup()->clearPrintArea();
+        foreach($students as $student){
+            if($ctr %10 == 0){
+                $set++;
+                if($set == 2){
+                    // $sheet->getPageSetup()-> addPrintAreaByColumnAndRow(1,$startPrintAreaRow,$weeks+1,$row);
+                    $set =0;
+                    $startPrintAreaRow = $row+2;
+                }
+                $this->createDateHeader($sheet,$row,$weeks);
+                // $row +=2;
+
+                $row++;
+            }
+            // $name = sprintf('%s, %s',$student->last_name,$student->first_name);
+            $sheet->setCellValueByColumnAndRow($col,$row,$student->name);
+            $sheet->mergecellsByColumnAndRow($col,$row,$col,$row+1);
+            $sheet->getRowDimension($row)->setRowHeight(25);
+            $sheet->getRowDimension($row+1)->setRowHeight(25);
+            $sheet->getStyleByColumnAndRow($col,$row)->getFont()->setSize(18);
+            // if($ctr % 2 == 0){
+            //     //style
+            // }
+            $sheet->getStyleByColumnAndRow($col+1,$row+1,$col+$weeks,$row+1)->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setRGB('d9d9d9');
+
+            // $ctr = ($ctr+1) %15;
+            $ctr++;
+            $row+=2;
+        }
+        $sheet->getStyleByColumnAndRow($col,1,$col+$weeks,$row-1)->applyFromArray([
+            'borders'=>[
+                'allBorders'=>[
+                    'borderStyle'=>\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color'=>['rgb'=>'000000']
+                ]
+            ]
+        ]);
+        $sheet->getColumnDimension('A')->setAutosize(true);
+        $sheet->getPageMargins()->setTop(0.25);
+        $sheet->getPageMargins()->setRight(0.25);
+        $sheet->getPageMargins()->setLeft(0.25);
+        $sheet->getPageMargins()->setBottom(0.25);
+        $sheet->getPageSetup()
+            ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
+        $sheet->getPageSetup()->setFitToWidth(1);
+        $sheet->getPageSetup()->setFitToHeight(0);
+    }
+
+    private function createDateHeader($sheet,$row,$weeks = 16){
+        $col = 1;
+        $sheet->setCellValueByColumnAndRow($col,$row,"학생 이름");
+        $col = 2;
+        // $month = $startDate->month;
+        // $monthcol = $col;
+        // $monthchanged=false;
+        // $weekctr = 0;
+        
+        for($i = 0;$i<$weeks;$i++){
+            $sheet->setCellValueByColumnAndRow($col,$row," ");
+            // $sheet->setCellValueByColumnAndRow($col,$row+1,$startDate);
+
+            // $startDate->addWeek();
+            // $weekctr++;
+            // if($startDate->month != $month || $weekctr+1 > $weeks){
+            //     $monthchanged=true;
+            //     $startDate->subMonth();
+            //     $sheet->setCellValueByColumnAndRow($monthcol,$row,$startDate->format('F'));
+            //     $startDate->addMonth();
+            //     //merge cell 
+            //     $monthcol = $col+1;
+            //     $month = $startDate->month;
+            // }
+            $col++;
+        }
+        $sheet->getStyleByColumnAndRow(1,$row,$weeks+1,$row)->applyFromArray([
+            'font'=>[
+                'size'=>20
+            ],
+            'alignment'=>[
+                'horizontal'=>\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
+            ],
+            'fill'=>[
+                'fillType'=>\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor'=>[
+                    'rgb'=>'fff3ce'
+                ]
+            ],
+            'borders'=>[
+                'allBorders'=>[
+                    'borderStyle'=>\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color'=>['rgb'=>'000000']
+                ]
+            ]
+        ]);
     }
 }

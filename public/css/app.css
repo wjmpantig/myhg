@@ -11965,3 +11965,21 @@ label.panel-block:hover {
   overflow-x: auto;
 }
 
+body.print {
+  margin: 0.25in;
+  font-size: 14pt;
+}
+
+body.print thead td {
+  text-align: center;
+  font-size: 12pt;
+  font-weight: bold;
+  vertical-align: middle;
+}
+
+@media print {
+  body {
+    margin: 0.25in;
+  }
+}
+

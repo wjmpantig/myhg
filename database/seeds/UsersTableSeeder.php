@@ -53,28 +53,10 @@ class UsersTableSeeder extends Seeder
         foreach($seasons as $season){
         	$sections = Section::where('season_id',$season->id)->get();
         	foreach($sections as $section){
-        		if(!strcmp($season->name,"18th") && !strcmp($section->name,"Advanced")){
-        			$path = storage_path('app/imports/students-advanced.csv');
-					$this->importUsersFromCSV($path,$this->student_type->id,$section->id);
-        		}else if(!strcmp($season->name,"18th") && !strcmp($section->name,"B1")){
-                    $path = storage_path('app/imports/students-b1.csv');
-                    $this->importUsersFromCSV($path,$this->student_type->id,$section->id);
-                }else if(!strcmp($season->name,"18th") && !strcmp($section->name,"B2")){
-                    $path = storage_path('app/imports/students-b2.csv');
-                    $this->importUsersFromCSV($path,$this->student_type->id,$section->id);
-                }else if(!strcmp($season->name,"18th") && !strcmp($section->name,"B3")){
-                    $path = storage_path('app/imports/students-b3.csv');
-                    $this->importUsersFromCSV($path,$this->student_type->id,$section->id);
-                }else if(!strcmp($season->name,"18th") && !strcmp($section->name,"B4")){
-                    $path = storage_path('app/imports/students-b4.csv');
-                    $this->importUsersFromCSV($path,$this->student_type->id,$section->id);
-                }else if(!strcmp($season->name,"18th") && !strcmp($section->name,"B5")){
-                    $path = storage_path('app/imports/students-b5.csv');
-                    $this->importUsersFromCSV($path,$this->student_type->id,$section->id);
-                }else if(!strcmp($season->name,"18th") && !strcmp($section->name,"Intermediate")){
-                    $path = storage_path('app/imports/students-intermediate.csv');
-                    $this->importUsersFromCSV($path,$this->student_type->id,$section->id);
-                }else{
+                $filename = storage_path('app/imports/'.str_slug($section->name).'.csv');
+        		if(!strcmp($season->name,"19th") && file_exists($filename)){
+        			$this->importUsersFromCSV($filename,$this->student_type->id,$section->id);
+        		}else{
         			$n = $this->faker->numberBetween(10,20);
         			for($i=0;$i<$n;$i++){
 	        			$student = $this->createFakeStudent();
@@ -108,14 +90,15 @@ class UsersTableSeeder extends Seeder
 		foreach($records as $offset => $record){
 			$validator = Validator::make($record,[
 	    		'email'=>'email|required|unique:users,email',
-	    		'first name'=>'required',
-	    		'last name'=>'required'
+	    		'first_name'=>'required',
+	    		'last_name'=>'required'
 	    	]);
+            // Log::debug($record);
 			if($validator->fails()){
 				// Log::debug($validator->errors());
                 if($validator->errors()->has('email')){
                     // Log::debug('generating fake email..');
-                    $email = $this->generateRandomEmail($record['first name'],$record['last name'],$this->faker);
+                    $email = $this->generateRandomEmail($record['first_name'],$record['last_name'],$this->faker);
                     $record['email'] =  $email;
                     // Log::debug("fake email generated: $email");
                 }else{
@@ -123,8 +106,8 @@ class UsersTableSeeder extends Seeder
                 }
 			}
 			$user = new User();
-			$user->first_name = title_case($record['first name']);
-			$user->last_name = title_case($record['last name']);
+			$user->first_name = title_case($record['first_name']);
+			$user->last_name = title_case($record['last_name']);
             if(isset($record['password'])){
                 $user->password = Hash::make($record['password']);
             }else{

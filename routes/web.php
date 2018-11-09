@@ -24,5 +24,5 @@ Route::get('/',function(){
 	}
 });
 Route::get('admin', 'HomeController@index')->name('admin_home');
+Route::get('test','ExportController@pdf');
 Route::get('export/{id}','ExportController@get');
-

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2 class="title">Export</h2>
+		
 		<form @submit.prevent="submit()">
 			<div class="field">
 				<label for="season" class="label">Season</label>
@@ -187,7 +187,7 @@
 					pass_finals_grade:this.pass_finals_grade,
 					passing_grade : this.passing_grade
 				}
-				axios.post('/api/export',data).then(response=>{
+				axios.post('/api/export/grades',data).then(response=>{
 					// console.log(response.data);
 					this.file = response.data;
 				}).catch(error=>{

@@ -70,7 +70,17 @@ module.exports={
 	},
 	{
 		path:'/export/',
-		component:require('./components/admin/Export.vue')
+		component:require('./components/admin/export/Export.vue'),
+		children:[
+			{
+				path:'',
+				component:require('./components/admin/export/ForPrint.vue'),
+			},
+			{
+				path:'grades',
+				component:require('./components/admin/export/Grades.vue'),
+			}
+		]
 	},
 	{
 		path:'*',

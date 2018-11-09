@@ -56,5 +56,6 @@ Route::middleware('auth:api')->group(function(){
 
 	Route::post('users/','UsersController@create');
 
-	Route::post('export','ExportController@export');
+	Route::post('export/grades','ExportController@export');
+	Route::post('export/print','ExportController@createPrintFile');
 });
