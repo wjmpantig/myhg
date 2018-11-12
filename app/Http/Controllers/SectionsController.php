@@ -73,6 +73,7 @@ class SectionsController extends Controller
     		->where('user_type_id',$student_type->id)
     		->where('section_id',$request->id)
             ->whereNull('section_students.deleted_at')
+            ->whereNull('users.deleted_at')
     		->orderBy('last_name','asc');
         if(!empty(trim($request->q))){
             $q = trim($request->q);
