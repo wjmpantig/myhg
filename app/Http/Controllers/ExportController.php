@@ -484,9 +484,12 @@ class ExportController extends Controller
 
         // $row = 5;
 
-        $ctr = 0;
+        $ctr = 2;
         // $date = Carbon::parse($request->start_date);
         $sheet->getPageSetup()->clearPrintArea();
+        $this->createDateHeader($sheet,$row,$weeks);
+        $row++;
+
         foreach($students as $student){
             if($ctr %15 == 0){
                 $set++;
@@ -494,6 +497,7 @@ class ExportController extends Controller
                     // $sheet->getPageSetup()-> addPrintAreaByColumnAndRow(1,$startPrintAreaRow,$weeks+1,$row);
                     $set =0;
                     $startPrintAreaRow = $row+2;
+                    $sheet->setBreakByColumnAndRow(0,$row-1,Worksheet::BREAK_ROW);
                 }
                 $this->createDateHeader($sheet,$row,$weeks);
                 // $row +=2;
@@ -549,16 +553,19 @@ class ExportController extends Controller
         $sheet->mergecellsByColumnAndRow($col,$row,$col+$weeks,$row);
         $row = 2;
 
-        $ctr = 0;
+        $ctr = 2;
         // $date = Carbon::parse($request->start_date);
-        $sheet->getPageSetup()->clearPrintArea();
+        // $sheet->getPageSetup()->clearPrintArea();
+        $this->createDateHeader($sheet,$row,$weeks);
+        $row++;
         foreach($students as $student){
-            if($ctr %10 == 0){
+            if($ctr %7 == 0){
                 $set++;
                 if($set == 2){
                     // $sheet->getPageSetup()-> addPrintAreaByColumnAndRow(1,$startPrintAreaRow,$weeks+1,$row);
                     $set =0;
                     $startPrintAreaRow = $row+2;
+                    $sheet->setBreakByColumnAndRow(0,$row-1,Worksheet::BREAK_ROW);
                 }
                 $this->createDateHeader($sheet,$row,$weeks);
                 // $row +=2;

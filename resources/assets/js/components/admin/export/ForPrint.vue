@@ -44,8 +44,19 @@
 					<input type="number" min="1" v-model="weeks" class="input">
 				</div>
 			</div>
-			<button class="button is-primary" type="submit">Export</button>
-			<a class="button is-info" :href="fileLink" v-show="file">Download</a>
+			<div class="field is-grouped">
+				<div class="control">
+					<button class="button is-primary" type="submit" :disabled="loading">
+						{{ loading ? "" : "Export" }}
+						<font-awesome-icon :icon="['fas','spinner']" class="fa-spin" v-show="loading"></font-awesome-icon>
+						
+					</button>
+					
+				</div>
+				<div class="control">
+					<a class="button is-info" :href="fileLink" v-show="file && !loading">Download</a>
+				</div>
+			</div>
 		</form>
 	</div>	
 </template>
@@ -59,6 +70,7 @@
 				section:null,
 				weeks: 16,
 				file: null,
+				loading:false,
 				// start_date:{
 				// 	date: null,
 				// 	errors: []
@@ -101,6 +113,7 @@
 				// 	date = this.$moment(date).format('YYYY-MM-DD');
 				// }
 				// console.log(date);
+				this.loading = true;
 				let data = {
 					id: this.section,
 					// start_date: date,
@@ -110,6 +123,8 @@
 					this.file=response.data;
 				}).catch(error=>{
 					console.error(error);
+				}).then(()=>{
+					this.loading = false;
 				});
 			}
 		}
