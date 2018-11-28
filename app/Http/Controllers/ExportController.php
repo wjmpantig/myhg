@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PDF;
 use Carbon\Carbon;
+use App\Season;
 use App\Section;
 use App\SectionAttendance;
 use App\SectionScore;
@@ -654,5 +655,54 @@ class ExportController extends Controller
                 ]
             ]
         ]);
+    }
+
+    public function class_lists(Request $request){
+        $request->validate([
+            'id'=>'required|exists:seasons,id'
+        ]);
+        $season = Season::with('sections')->findOrFail($request->id);
+        $sections = $season->sections;
+        $spreadsheet = new Spreadsheet();
+        foreach($sections as $section){
+            $students = DB::table('section_students')
+                ->select('users.id as id',DB::raw('CONCAT(last_name,", ",first_name) as name'))
+                ->leftJoin('users','student_id','=','users.id')
+                ->leftJoin('sections','sections.id','=','users.id')
+                ->where('section_id',$section->id)
+                ->whereNull('users.deleted_at')
+                ->whereNull('sections.deleted_at')
+                ->whereNull('section_students.deleted_at')
+                ->orderBy('last_name')
+                ->get();
+            $sheet = new Worksheet($spreadsheet);
+            $spreadsheet->addSheet($sheet);
+            $sheet->setTitle($section->name);
+            $row = 1;
+            $col = 1;
+            $sheet->setCellValueByColumnAndRow($col,$row++,$section->name." Class List");
+            $row++;
+            $sheet->setCellValueByColumnAndRow($col,$row++,'학생 이름');
+            $ctr=0;
+            foreach($students as $student){
+                $sheet->setCellValueByColumnAndRow($col,$row++,$student->name);
+                $ctr++;
+            }
+            $sheet->setCellValueByColumnAndRow($col,++$row,'Total Students: ' . $ctr);
+
+        }
+        $time = Carbon::now();
+        $filename = sprintf("class_list-%s.xlsx",$time->format("Y-m-d-U"));
+        // $filename = "test.xlsx";
+        // return $filename;
+        $filename = storage_path('app/public/'.$filename);
+        $file = new ExportFile();
+        $file->filename = $filename;
+        $file->save();
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($filename);
+        // $out = is_null($this->debug) ? 'complete' : $this->debug;
+        Log::info(sprintf("user %d created file %d",Auth::user()->id,$file->id));
+        return $file;
     }
 }

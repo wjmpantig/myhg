@@ -3,7 +3,8 @@ module.exports={
  routes: [
 	{
 		path: '/',
-		component: require('./components/admin/Dashboard.vue')
+		// component: require('./components/admin/Dashboard.vue')
+		redirect:'/sections'
 	},
 	{
 		path: '/sections',
@@ -79,7 +80,11 @@ module.exports={
 			{
 				path:'grades',
 				component:require('./components/admin/export/Grades.vue'),
-			}
+			},
+			{
+				path:'class-lists',
+				component:require('./components/admin/export/ClassLists.vue'),
+			},
 		]
 	},
 	{
