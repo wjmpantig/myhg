@@ -166,6 +166,7 @@ class ScoresController extends Controller
     	$section_id = $request->section_id;
     	$date = $request->date;
     	$date = Carbon::parse($date)->format('Y-m-d');
+        $type_id = $request->type_id;
     	// return $date;
     	
     	$request->validate(
@@ -175,9 +176,10 @@ class ScoresController extends Controller
 				'date' => [
 					'required',
 					'date_format:Y-m-d',
-					Rule::unique('section_scores')->where(function($query) use($date,$section_id){
+					Rule::unique('section_scores')->where(function($query) use($date,$section_id,$type_id){
 						return $query->where('date',$date)
 							->where('section_id',$section_id)
+                            ->where('score_type_id',$type_id)
 							->whereNull('deleted_at');
 					})
 				]
