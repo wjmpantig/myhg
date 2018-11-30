@@ -424,11 +424,13 @@ class ExportController extends Controller
         // return $pdf->download('attendance-'.$section->name.'.pdf');
         return view('pdf.attendance',$data);
     }
+
     public function createPrintFile(Request $request){
         $request->validate([
             'id'=>'required|exists:sections,id',
             // 'start_date'=>'required|date_format:Y-m-d',
-            'weeks'=>'required|numeric|min:1'
+            'weeks'=>'required|numeric|min:1',
+            'include_grades'=>'required|boolean'
         ]);
         $section = Section::findOrFail($request->id);
         $id= $request->id;
@@ -443,13 +445,74 @@ class ExportController extends Controller
             ->whereNull('section_students.deleted_at')
             ->orderBy('last_name')
             ->get();
+
+        $temp_score_dates = SectionScore::where('section_id',$id)
+            ->whereIn('score_type_id',[1,2])
+            ->orderBy('date')
+            ->get();
+        // dd($request->include_grades);
+        if($request->include_grades){
+            $attendance_dates = SectionAttendance::where('section_id',$request->id)
+                ->orderBy('date')
+                ->get();
+
+            foreach($students as $student){
+                
+                $student_scores = StudentScore::where('student_id',$student->id)
+                    ->whereIn('section_score_id',$temp_score_dates->pluck('id'))
+                    ->get();
+                $student_scores = $student_scores->mapWithKeys(function($item){
+                        return [$item['section_score_id']=>$item['score']];
+                    }
+                );
+                $student->scores = $student_scores;
+
+
+
+                $attendance = StudentAttendance::where('student_id',$student->id)
+                    ->whereIn('section_attendance_id',$attendance_dates->pluck('id'))
+                    ->get();
+                $attendance = $attendance->mapWithKeys(function($item){
+                    return [$item['section_attendance_id']=>$var = filter_var($item['is_present'], FILTER_VALIDATE_BOOLEAN)];
+                });
+                $student->attendance = $attendance;
+            }
+
+            $score_dates = collect();
+            $last_date = null;
+
+            // Log::debug(print_r($temp_score_dates->dump(),true));
+            for($i=0;$i<$temp_score_dates->count();$i++){
+                // Log::debug('loop '. $i);
+                $dateObj = $temp_score_dates[$i];
+
+                $date = $dateObj->date =  Carbon::parse($dateObj->date);
+                // Log::debug('loop '.$i,[$date]);
+                if($last_date == $date->format('m/d')){
+                    $prev = $score_dates->last();
+                    if(isset($prev->date_list)){
+                        $prev->date_list->push($dateObj);
+                    }else{
+                        $prev->date_list = collect([$prev,$dateObj]);
+                    }
+                    
+                    continue;
+                }else{
+                    $score_dates->push($dateObj);
+                    $last_date = $date->format('m/d');
+                }
+            }
+        }
+
+        // Log::debug('dates',[$score_dates]);
+
         $spreadsheet = new Spreadsheet();
         $attendance_sheet = $spreadsheet->getActiveSheet();
         
-        $this->createPrintAttendanceSheet($attendance_sheet,$students,$section,$weeks);
+        $this->createPrintAttendanceSheet($attendance_sheet,$students,$section,$weeks,isset($attendance_dates) ? $attendance_dates : null);
         $perf_sheet = new Worksheet($spreadsheet);
         $spreadsheet->addSheet($perf_sheet);
-        $this->createRecordSheet($perf_sheet,$students,$section,$weeks);
+        $this->createRecordSheet($perf_sheet,$students,$section,$weeks,isset($score_dates) ? $score_dates : null);
         $time = Carbon::now();
         $filename = sprintf("print_%s-%s.xlsx",$section->name,$time->format("Y-m-d-U"));
         // $filename = "test.xlsx";
@@ -466,7 +529,7 @@ class ExportController extends Controller
         return $file;
     }
 
-    private function createPrintAttendanceSheet($sheet,$students,$section,$weeks){
+    private function createPrintAttendanceSheet($sheet,$students,$section,$weeks,$dates=null){
         $sheet->setTitle('Attendance');
         $row = 1;
         $startPrintAreaRow = 1;
@@ -488,7 +551,7 @@ class ExportController extends Controller
         $ctr = 2;
         // $date = Carbon::parse($request->start_date);
         $sheet->getPageSetup()->clearPrintArea();
-        $this->createDateHeader($sheet,$row,$weeks);
+        $this->createDateHeader($sheet,$row,$weeks,$dates);
         $row++;
 
         foreach($students as $student){
@@ -500,13 +563,38 @@ class ExportController extends Controller
                     $startPrintAreaRow = $row+2;
                     $sheet->setBreakByColumnAndRow(0,$row-1,Worksheet::BREAK_ROW);
                 }
-                $this->createDateHeader($sheet,$row,$weeks);
+                $this->createDateHeader($sheet,$row,$weeks,$dates);
                 // $row +=2;
 
                 $row++;
             }
             // $name = sprintf('%s, %s',$student->last_name,$student->first_name);
             $sheet->setCellValueByColumnAndRow($col,$row,$student->name);
+
+            if(!is_null($dates)){
+                $col++;
+                foreach($dates as $date){
+                    // Log::debug('set',[$student->attendance->{$date->id}]);
+
+                    if(isset($student->attendance[$date->id] ) ){
+                        
+                        $val = $student->attendance[$date->id] ? "✓" : " ";
+                        $sheet->setCellValueByColumnAndRow($col,$row,$val);
+
+                    }
+                    $col++;
+                }
+                $sheet->getStyleByColumnAndRow(1,$row,$col,$row)->applyFromArray([
+                    'font'=>[
+                        'size'=>20,
+                        'bold'=>true
+                    ],
+                    'alignment'=>[
+                        'horizontal'=>\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
+                    ],
+                ]);
+                $col = 1;
+            }
             $sheet->getStyleByColumnAndRow($col,$row)->getFont()->setSize(18);
             if($ctr % 2 == 0){
                 //style
@@ -538,7 +626,7 @@ class ExportController extends Controller
         $sheet->getPageSetup()->setFitToHeight(0);
     }
 
-    private function createRecordSheet($sheet,$students,$section,$weeks){
+    private function createRecordSheet($sheet,$students,$section,$weeks,$dates=null){
         $sheet->setTitle('Performance');
         $row = 1;
         $startPrintAreaRow = 1;
@@ -555,38 +643,77 @@ class ExportController extends Controller
         $row = 2;
 
         $ctr = 2;
-        // $date = Carbon::parse($request->start_date);
-        // $sheet->getPageSetup()->clearPrintArea();
-        $this->createDateHeader($sheet,$row,$weeks);
+        
+        $this->createDateHeader($sheet,$row,$weeks,$dates);
         $row++;
         foreach($students as $student){
             if($ctr %7 == 0){
                 $set++;
                 if($set == 2){
-                    // $sheet->getPageSetup()-> addPrintAreaByColumnAndRow(1,$startPrintAreaRow,$weeks+1,$row);
+                    
                     $set =0;
                     $startPrintAreaRow = $row+2;
                     $sheet->setBreakByColumnAndRow(0,$row-1,Worksheet::BREAK_ROW);
                 }
-                $this->createDateHeader($sheet,$row,$weeks);
+                $this->createDateHeader($sheet,$row,$weeks,$dates);
                 // $row +=2;
 
                 $row++;
             }
             // $name = sprintf('%s, %s',$student->last_name,$student->first_name);
             $sheet->setCellValueByColumnAndRow($col,$row,$student->name);
+
+            if(!is_null($dates)){
+                $col++;
+                // Log::debug('dates',$dates->toArray());
+                // Log::debug('user scores', $student->scores->toArray());
+                foreach($dates as $date){
+                    // Log::debug('set',[$student->attendance->{$date->id}]);
+                    
+                    if(isset($date->date_list)){
+                        // Log::debug("$row, $col : has date_list");
+                        // Log::debug('date: '.print_r($date,true));
+                        // Log::debug('date list: '.print_r($date->date_list,true));
+                        // Log::debug('scores: '.print_r($student->scores,true));
+                        // dd($date);
+                        foreach($date->date_list as $d){
+                        
+                            if(isset($student->scores[$d['id']] ) ){
+                        
+                                $val = $student->scores[$d['id']];
+                                $sheet->setCellValueByColumnAndRow($col,$row+($d['score_type_id'] == 1 ? 1 : 0),$val);
+                                
+                            }
+                        }
+                    }else if(isset($student->scores[$date->id] ) ){
+                        // Log::debug("$row, $col : has id");
+                        $val = $student->scores[$date->id];
+                        $sheet->setCellValueByColumnAndRow($col,$row+($date->score_type_id == 1 ? 1 : 0),$val);
+
+                    }
+                    $col++;
+                }
+                $sheet->getStyleByColumnAndRow(1,$row,$col,$row+1)->applyFromArray([
+                    'font'=>[
+                        'size'=>15,
+                        // 'bold'=>true
+                    ],
+                    'alignment'=>[
+                        'horizontal'=>\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
+                    ],
+                ]);
+                $col = 1;
+            }
             $sheet->mergecellsByColumnAndRow($col,$row,$col,$row+1);
             $sheet->getRowDimension($row)->setRowHeight(25);
             $sheet->getRowDimension($row+1)->setRowHeight(25);
             $sheet->getStyleByColumnAndRow($col,$row)->getFont()->setSize(18);
-            // if($ctr % 2 == 0){
-            //     //style
-            // }
+            
             $sheet->getStyleByColumnAndRow($col+1,$row+1,$col+$weeks,$row+1)->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setRGB('d9d9d9');
 
-            // $ctr = ($ctr+1) %15;
+            
             $ctr++;
             $row+=2;
         }
@@ -609,7 +736,7 @@ class ExportController extends Controller
         $sheet->getPageSetup()->setFitToHeight(0);
     }
 
-    private function createDateHeader($sheet,$row,$weeks = 16){
+    private function createDateHeader($sheet,$row,$weeks,$dates = null){
         $col = 1;
         $sheet->setCellValueByColumnAndRow($col,$row,"학생 이름");
         $col = 2;
@@ -617,9 +744,18 @@ class ExportController extends Controller
         // $monthcol = $col;
         // $monthchanged=false;
         // $weekctr = 0;
+        $weeks = !is_null($dates) ? max([$dates->count(),$weeks]) : $weeks;
+        $last_date = null;
         
         for($i = 0;$i<$weeks;$i++){
-            $sheet->setCellValueByColumnAndRow($col,$row," ");
+            if(is_null($dates) || (!is_null($dates) && $i >= $dates->count() ) ){
+                $sheet->setCellValueByColumnAndRow($col,$row," ");
+            }else{
+                $date = $dates[$i]->date->format('m/d');
+                
+                
+                $sheet->setCellValueByColumnAndRow($col,$row,$date);
+            }
             // $sheet->setCellValueByColumnAndRow($col,$row+1,$startDate);
 
             // $startDate->addWeek();
@@ -653,6 +789,11 @@ class ExportController extends Controller
                     'borderStyle'=>\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                     'color'=>['rgb'=>'000000']
                 ]
+            ]
+        ]);
+        $sheet->getStyleByColumnAndRow(2,$row,$weeks+1,$row)->applyFromArray([
+            'font'=>[
+                'size'=>17
             ]
         ]);
     }

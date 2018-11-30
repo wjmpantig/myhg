@@ -23,6 +23,17 @@
 					
 				</div>
 			</div>
+
+			<div class="field">
+				<label for="include_grades" class="label">Include recorded grades?</label>
+				<div class="control">
+					<label for="include_grades" class="checkbox">
+						<input type="checkbox" name="include_grades" v-model="include_grades"> 
+						Yes
+					</label>					
+					
+				</div>
+			</div>
 			
 			<!-- <div class="field">
 				<label for="start_date" class="label">Starting date</label>
@@ -71,6 +82,7 @@
 				weeks: 16,
 				file: null,
 				loading:false,
+				include_grades:false,
 				// start_date:{
 				// 	date: null,
 				// 	errors: []
@@ -114,10 +126,12 @@
 				// }
 				// console.log(date);
 				this.loading = true;
+				this.file = null;
 				let data = {
 					id: this.section,
 					// start_date: date,
-					weeks: this.weeks
+					weeks: this.weeks,
+					include_grades: this.include_grades
 				}
 				axios.post('/api/export/print',data).then(response=>{
 					this.file=response.data;
