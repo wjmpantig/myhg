@@ -45,7 +45,7 @@
 			</div>
 		</div>
 		<div class="table-wrapper" v-show="scores.length > 0">
-			<table v-bind:class="{'table is-hoverable is-bordered is-striped': true,'is-fullwidth is-narrow':scores.length > 5}">				
+			<table v-bind:class="{'table scores-table is-hoverable is-bordered is-striped': true,'is-fullwidth is-narrow':scores.length > 5}">				
 				<thead>
 					<tr>
 						<th>Total</th>
@@ -237,6 +237,19 @@
 				});
 			}
 
+		},
+		updated(){
+			this.$nextTick(function () {
+		 
+			$('.scores-table').floatThead({
+				responsiveContainer: function($table){
+					return $table.closest('.table-wrapper');
+				},
+				autoReflow: true,
+				position: 'fixed'
+			})
+		 
+		})
 		}
 	}
 

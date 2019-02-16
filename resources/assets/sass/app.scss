@@ -44,7 +44,13 @@
 @import '~bulma/bulma';
 .table-wrapper{
 	overflow-x: auto;
+	position: relative;
+	// .header-clone-table{
+	// 	position:fixed;
+	// 	top:0;
+	// }
 }
+
 // table.table{
 // 	overflow: hidden;
 // 	td,th{

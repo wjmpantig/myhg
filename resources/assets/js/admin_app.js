@@ -20,6 +20,8 @@ library.add(faEdit,faTrashAlt,faBars,faTimes,faSearch,faFileExport,faCalendarAlt
 require('./bootstrap');
 
 window.Vue = require('vue');
+window.$ = window.jQuery = require('jquery');
+require('floatthead');
 import VuejsDialog from 'vuejs-dialog';
 import VueRouter from 'vue-router';
 import vueDebounce from 'vue-debounce'

@@ -21,7 +21,8 @@
 		
 		
 		<div class="table-wrapper" v-show="dates.length > 0">
-			<table v-bind:class="{'table is-hoverable is-bordered is-striped': true,'is-fullwidth is-narrow':dates.length > 5}">				
+			<table v-bind:class="{'table is-hoverable is-bordered is-striped attendance-table': true,
+			'is-fullwidth is-narrow':dates.length > 5}">				
 				<thead>
 					<tr>
 						<th>Name</th>
@@ -36,8 +37,11 @@
 				<tbody>
 					<tr v-for="(student,index) in students">
 						<td>{{ student.last_name}}, {{ student.first_name}}</td>
-						<td v-for="(date,index) in dates" class="has-text-centered">
-							<input type="checkbox" v-model="student.attendance[date.id]" v-on:change="togglePresent(student.id,date.id,student.attendance[date.id])">
+						<td v-for="(date,index) in dates" class="has-text-centered" 
+							>
+							<input type="checkbox" v-model="student.attendance[date.id]"
+								:ref="'check_' + student.id + '_' + date.id"
+								v-on:change="togglePresent(student.id,date.id,student.attendance[date.id],index)">
 						</td>
 					</tr>
 				</tbody>
@@ -72,11 +76,16 @@ export default{
 		// }
 	},
 	methods:{
-		togglePresent(student_id,section_attendance_id,value){
+		togglePresent(student_id,section_attendance_id,value,index){
+			if(value ==null){
+				value = !this.students[index].attendance[section_attendance_id];
+			}
 			axios.post('/api/sections/'+this.$route.params.id+'/attendance',
 				{section_attendance_id,student_id,value}
 				).then(response=>{
-				console.log(response.data);
+				// console.log(response.data);
+				const val = response.data.is_present;
+				this.students[index].attendance[section_attendance_id] = val;
 			}).catch(err=>{
 				if(err.response){
 					console.error(err.response.data.message);
@@ -143,6 +152,19 @@ export default{
 				}
 			});
 		}
+	},
+	updated(){
+		this.$nextTick(function () {
+		 
+			$('.attendance-table').floatThead({
+				responsiveContainer: function($table){
+					return $table.closest('.table-wrapper');
+				},
+				autoReflow: true,
+				position: 'fixed'
+			})
+		 
+		})
 	}
 
 }
