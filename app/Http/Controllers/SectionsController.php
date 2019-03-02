@@ -201,11 +201,11 @@ class SectionsController extends Controller
 				'date' => [
 					'required',
 					'date_format:Y-m-d',
-					Rule::unique('section_attendances')->where(function($query) use($date,$section_id){
-						return $query->where('date',$date)
-							->where('section_id',$section_id)
-							->whereNull('deleted_at');
-					})
+					// Rule::unique('section_attendances')->where(function($query) use($date,$section_id){
+					// 	return $query->where('date',$date)
+					// 		->where('section_id',$section_id)
+					// 		->whereNull('deleted_at');
+					// })
 				]
     		]
     	);
