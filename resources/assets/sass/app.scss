@@ -69,6 +69,16 @@
 // 	}
 // }
 
+.vdp-datepicker__calendar{
+	z-index: 9999 !important;
+}
+
+// table{
+// 	td.alert{
+// 		background: $alert-color;
+// 	}
+// }
+
 body.print{
 	margin: 0.25in;
 	

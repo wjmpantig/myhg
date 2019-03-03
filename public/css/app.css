@@ -12841,6 +12841,10 @@ label.panel-block:hover {
   position: relative;
 }
 
+.vdp-datepicker__calendar {
+  z-index: 9999 !important;
+}
+
 body.print {
   margin: 0.25in;
   font-size: 14pt;

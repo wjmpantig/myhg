@@ -35,13 +35,15 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="(student,index) in students">
+					<tr v-for="(student,studentIndex) in students">
 						<td>{{ student.last_name}}, {{ student.first_name}}</td>
-						<td v-for="(date,index) in dates" class="has-text-centered" 
+						<td v-for="(date,index) in dates" 
+							:class="{'has-text-centered' : true, 'has-background-danger' :false}" 
 							>
 							<input type="checkbox" v-model="student.attendance[date.id]"
 								:ref="'check_' + student.id + '_' + date.id"
-								v-on:change="togglePresent(student.id,date.id,student.attendance[date.id],index)">
+								v-on:change="togglePresent(student.id,date.id,student.attendance[date.id],index)"
+								">
 						</td>
 					</tr>
 				</tbody>
@@ -87,12 +89,16 @@ export default{
 				const val = response.data.is_present;
 				this.students[index].attendance[section_attendance_id] = val;
 			}).catch(err=>{
+				// this.students[index].attendance[section_attendance_id] = !value;
 				if(err.response){
 					console.error(err.response.data.message);
 				}else{
 					console.error(err);
 				}
 			});
+		},
+		key_test(){
+
 		},
 		loadAttendance(){
 			this.dates = [];
