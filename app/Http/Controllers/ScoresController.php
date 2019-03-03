@@ -176,12 +176,12 @@ class ScoresController extends Controller
 				'date' => [
 					'required',
 					'date_format:Y-m-d',
-					Rule::unique('section_scores')->where(function($query) use($date,$section_id,$type_id){
-						return $query->where('date',$date)
-							->where('section_id',$section_id)
-                            ->where('score_type_id',$type_id)
-							->whereNull('deleted_at');
-					})
+					// Rule::unique('section_scores')->where(function($query) use($date,$section_id,$type_id){
+					// 	return $query->where('date',$date)
+					// 		->where('section_id',$section_id)
+     //                        ->where('score_type_id',$type_id)
+					// 		->whereNull('deleted_at');
+					// })
 				]
     		]
     	);
