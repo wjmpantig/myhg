@@ -43,7 +43,7 @@
 							<input type="checkbox" v-model="student.attendance[date.id]"
 								:ref="'check_' + student.id + '_' + date.id"
 								v-on:change="togglePresent(student.id,date.id,student.attendance[date.id],index)"
-								">
+							>
 						</td>
 					</tr>
 				</tbody>
