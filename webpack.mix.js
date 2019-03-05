@@ -23,9 +23,11 @@ mix.js(	'resources/assets/js/admin_app.js','public/js')
 		'@fortawesome/vue-fontawesome',
 		'vue-debounce',
 		])
+	.version()
 	.sourceMaps();
 // mix.js('resources/assets/js/login_app.js','public/js').sourceMaps();
 mix.sass('resources/assets/sass/app.scss', 'public/css')
-   .browserSync({
-   		proxy: 'myhg.local'
-   });
+	.version()
+	.browserSync({
+		proxy: 'myhg.local'
+	});

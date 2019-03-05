@@ -12845,6 +12845,10 @@ label.panel-block:hover {
   z-index: 9999 !important;
 }
 
+.table-wrapper {
+  margin-top: 3rem;
+}
+
 body.print {
   margin: 0.25in;
   font-size: 14pt;

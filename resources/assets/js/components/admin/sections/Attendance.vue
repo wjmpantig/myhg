@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<form @submit.prevent="addAttendance">
+		<form @submit.prevent="addAttendance" class="date-form">
 			<div class="field has-addons">
 				<div class="control has-icons-left">
 					<datepicker placeholder="New date" v-bind:input-class="{'input':true,'is-danger': new_date.errors.length>0}" v-model="new_date.date" format="MMM dd yyyy"></datepicker>
@@ -42,7 +42,7 @@
 							>
 							<input type="checkbox" v-model="student.attendance[date.id]"
 								:ref="'check_' + student.id + '_' + date.id"
-								v-on:change="togglePresent(student.id,date.id,student.attendance[date.id],index)"
+								v-on:change="togglePresent(student.id,date.id,student.attendance[date.id],studentIndex)"
 							>
 						</td>
 					</tr>
@@ -89,7 +89,7 @@ export default{
 				const val = response.data.is_present;
 				this.students[index].attendance[section_attendance_id] = val;
 			}).catch(err=>{
-				// this.students[index].attendance[section_attendance_id] = !value;
+				this.students[index].attendance[section_attendance_id] = !value;
 				if(err.response){
 					console.error(err.response.data.message);
 				}else{
@@ -148,6 +148,7 @@ export default{
 				date
 			}).then(response=>{
 				// console.log(response.data)
+				this.new_date.date = null;
 				this.loadAttendance();
 			}).catch(err=>{
 				if(err.response){
