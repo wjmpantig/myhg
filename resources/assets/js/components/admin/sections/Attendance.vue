@@ -39,10 +39,12 @@
 						<td>{{ student.last_name}}, {{ student.first_name}}</td>
 						<td v-for="(date,index) in dates" 
 							:class="{'has-text-centered' : true, 'has-background-danger' :false}" 
+							@click.self="toggleClick(student.id,date.id)"
 							>
 							<input type="checkbox" v-model="student.attendance[date.id]"
 								:ref="'check_' + student.id + '_' + date.id"
-								v-on:change="togglePresent(student.id,date.id,student.attendance[date.id],studentIndex)"
+								@change="togglePresent(student.id,date.id,student.attendance[date.id],studentIndex)"
+								@keyup="key_test()"
 							>
 						</td>
 					</tr>
@@ -78,6 +80,10 @@ export default{
 		// }
 	},
 	methods:{
+		toggleClick(student_id,date_id){
+			let checkbox = this.$refs['check_' + student_id + '_' + date_id];
+			$(checkbox).click().focus();
+		},
 		togglePresent(student_id,section_attendance_id,value,index){
 			if(value ==null){
 				value = !this.students[index].attendance[section_attendance_id];
@@ -97,8 +103,8 @@ export default{
 				}
 			});
 		},
-		key_test(){
-
+		key_test(event){
+			console.log(event.key);
 		},
 		loadAttendance(){
 			this.dates = [];

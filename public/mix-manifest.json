@@ -1,6 +1,10 @@
 {
-    "/js/admin_app.js": "/js/admin_app.js?id=9a817ebb31d52be1a254",
-    "/css/app.css": "/css/app.css?id=ffc34763895fcadffe5a",
-    "/js/vendor.js": "/js/vendor.js?id=135a007a502f92a47c4d",
-    "/js/manifest.js": "/js/manifest.js?id=360cf4a2ac3af2c3da19"
+    "/js/admin_app.js": "/js/admin_app.js?id=ff0b5d1930efc57907da",
+    "/css/app.css": "/css/app.css?id=cbb66609dab570b69b75",
+    "/js/admin_app.js.map": "/js/admin_app.js.map?id=07f8a52eb0ff7e834c09",
+    "/css/app.css.map": "/css/app.css.map?id=f0484dbf0f6bb2ca391c",
+    "/js/vendor.js": "/js/vendor.js?id=9bfe19e555e605264b6a",
+    "/js/vendor.js.map": "/js/vendor.js.map?id=5287efab9dad642cb2e9",
+    "/js/manifest.js": "/js/manifest.js?id=d64713044d4b02b1808b",
+    "/js/manifest.js.map": "/js/manifest.js.map?id=da76c0707ab14d36df9e"
 }
