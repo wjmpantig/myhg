@@ -57,7 +57,10 @@ Route::middleware('auth:api')->group(function(){
 
 	Route::post('user/password','UsersController@update_password');
 
-	Route::post('users/','UsersController@create');
+	Route::get('users','UsersController@all');
+	Route::post('users','UsersController@create');
+	Route::get('users/{id}','UsersController@get');
+	Route::post('users/{id}','UsersController@update');
 
 	Route::post('export/grades','ExportController@export');
 	Route::post('export/print','ExportController@createPrintFile');

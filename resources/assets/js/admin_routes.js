@@ -57,10 +57,10 @@ module.exports={
 		path: '/students/new',
 		component: require('./components/admin/students/NewStudent.vue')
 	},
-	{
-		path:'/students/:id/transfer',
-		component:require('./components/admin/students/TransferStudent.vue')
-	},
+	// {
+	// 	path:'/students/:id/transfer',
+	// 	component:require('./components/admin/students/TransferStudent.vue')
+	// },
 	{
 		path:'/students/:id',
 		component:require('./components/admin/students/Student.vue')
@@ -68,6 +68,14 @@ module.exports={
 	{
 		path:'/settings/',
 		component:require('./components/admin/Settings.vue')
+	},
+	{
+		path:'/users',
+		component:require('./components/admin/users/Users.vue')
+	},
+	{
+		path:'/users/:id',
+		component:require('./components/admin/users/User.vue')
 	},
 	{
 		path:'/users/create',
