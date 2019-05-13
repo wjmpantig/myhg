@@ -1,6 +1,7 @@
 <aside class="menu">
      <ul class="menu-list">
         <li><router-link to="/" exact>Dashboard</router-link></li>
+        <li><router-link to="/seasons">Seasons</router-link></li>
         <li><router-link to="/sections">Sections</router-link></li>
         <!-- <li><router-link to="/teachers"><a>Teachers</a></router-link></li> -->
         <li><router-link to="/students">Students</router-link></li>

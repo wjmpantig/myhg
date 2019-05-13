@@ -20,6 +20,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::middleware('auth:api')->group(function(){
 	Route::get('seasons','SeasonsController@all');
 	Route::get('seasons/latest','SeasonsController@latest');
+	Route::put('seasons','SeasonsController@create');
+	Route::post('seasons/{id}','SeasonsController@update');
+	Route::delete('seasons/{id}','SeasonsController@delete');
 	Route::get('user_types','UserTypesController@all');
 	Route::get('score_types/','ScoresController@score_types');
 	Route::get('score_types/{id}','ScoresController@score_types');

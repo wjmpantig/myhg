@@ -7,6 +7,10 @@ module.exports={
 		redirect:'/sections'
 	},
 	{
+		path: '/seasons',
+		component: require('./components/admin/seasons/Seasons.vue')
+	},
+	{
 		path: '/sections',
 		component: require('./components/admin/sections/Sections.vue')
 	},
