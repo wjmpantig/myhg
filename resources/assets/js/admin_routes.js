@@ -74,12 +74,12 @@ module.exports={
 		component:require('./components/admin/users/Users.vue')
 	},
 	{
-		path:'/users/:id',
-		component:require('./components/admin/users/User.vue')
-	},
-	{
 		path:'/users/create',
 		component:require('./components/admin/users/CreateUser.vue')
+	},
+	{
+		path:'/users/:id',
+		component:require('./components/admin/users/User.vue')
 	},
 	{
 		path:'/export/',
