@@ -1,6 +1,7 @@
 <template>
    <div>
-		<h2 class="title">{{user.last_name}} {{user.first_name}}</h2>
+      <h1 class="title">Edit user</h1>
+		<h2 class="subtitle">{{user.last_name}} {{user.first_name}}</h2>
       <form @submit.prevent="updateUser()">
          <div class="field">
             <label for="" class="label">Last name</label>
