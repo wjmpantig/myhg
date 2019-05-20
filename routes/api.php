@@ -30,6 +30,7 @@ Route::middleware('auth:api')->group(function(){
 
 	Route::get('sections','SectionsController@all');
 	Route::get('sections/{id}','SectionsController@get');
+	Route::put('sections','SectionsController@create');
 	Route::post('sections/{id}','SectionsController@update');
 	Route::delete('sections/{id}','SectionsController@delete');
 

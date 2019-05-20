@@ -30,7 +30,19 @@ class SectionsController extends Controller
             $sections = $sections->whereNotIn('id',[$request->except]);
         }
 		return $sections->get();
-    }
+	}
+	
+	public function create(Request $request){
+		$request->validate([
+			'name'=>'required',
+			'season_id'=>'required|exists:seasons,id'
+		]);
+		$section = new Section();
+		$section->season_id = $request->season_id;
+		$section->name = $request->name;
+		$section->save();
+		return $section;
+	}
 
     public function update(Request $request){
     	$request->validate([

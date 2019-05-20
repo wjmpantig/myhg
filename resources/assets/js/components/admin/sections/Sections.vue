@@ -9,9 +9,18 @@
 						<option v-for="season in seasons" :value="season.id">{{season.name}}</option>
 					</select>
 				</div>
-				
 			</div>
 		</div>
+		<form @submit.prevent="createSection()" :disabled="loading">
+         <div class="field has-addons">
+            <div class="control">
+               <input type="text" class="input" v-model="section.name" placeholder="New section name.." :disabled="loading" required/>
+            </div>
+            <div class="control">
+               <button class="button is-primary" type="submit">Add new section</button>
+            </div>
+         </div>
+      </form>
 		<table class="table is-bordered is-striped is-hoverable">
 			<thead>
 				<tr>
@@ -53,22 +62,23 @@ export default{
 			season: null,
 			sections: [],
 			seasons: [],
+			section:{
+				name:null
+			},
+			loading: false,
 		}
 	},
 	mounted(){
-		axios.get('/api/seasons').then(response=>{
+		this.loadSeasons();
+	},
+	methods:{
+		loadSeasons(){
+			axios.get('/api/seasons').then(response=>{
 				this.seasons = response.data;
 				this.season = this.seasons[0].id;
 				this.loadSections();
 			});
-		// axios.get('api/seasons/').then(response=>{
-		// 	console.log(response)
-		// }).catch(err=>{
-		// 	console.error(err);
-		// });
-		
-	},
-	methods:{
+		},
 		loadSections(){
 			this.sections = [];
 			axios.get('api/sections/',{
@@ -79,6 +89,21 @@ export default{
 				this.sections = response.data;
 			}).catch(err=>{
 				console.error(err);
+			});
+		},
+		createSection(){
+			const data = {
+				name: this.section.name,
+				season_id: this.season
+			}
+			this.loading = true;
+			axios.put('api/sections',data).then((response)=>{
+				this.sections.push(response.data);
+				this.section.name = null;
+				this.loading = false;
+			}).catch(err=>{
+				console.log(err);
+				this.loading = false;
 			});
 		},
 		toggleEditable(section,index){
