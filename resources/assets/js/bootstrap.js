@@ -34,7 +34,7 @@ window.axios.interceptors.response.use(response => {
         alert('You are not authorized to do this action. Please login again.');
         window.location.href = '/login';
     }
-    return err;
+    return Promise.reject(err.response);
 })
 /**
  * Next we will register the CSRF Token as a common header with Axios so that

@@ -46,6 +46,10 @@ module.exports={
 				meta:{
 					type_id: 3
 				}
+			},
+			{
+				path:'import',
+				component: require('./components/admin/sections/Import.vue'),
 			}
 		]
 	},

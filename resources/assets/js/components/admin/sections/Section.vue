@@ -9,6 +9,7 @@
 				<router-link tag="li" :to="{path:'/sections/' + id + '/homeworks'}" class="tabs-title" active-class="is-active" exact><a>Homeworks</a></router-link>
 				<router-link tag="li" :to="{path:'/sections/' + id + '/quizzes'}" class="tabs-title" active-class="is-active" exact><a>Quizzes</a></router-link>
 				<router-link tag="li" :to="{path:'/sections/' + id + '/finals'}" class="tabs-title" active-class="is-active" exact><a>Final Exam</a></router-link>
+				<router-link tag="li" :to="{path:'/sections/' + id + '/import'}" class="tabs-title" active-class="is-active" exact><a>Import</a></router-link>
 			</ul>
 		</div>
 		<router-view :key="$route.path"></router-view>	
@@ -21,7 +22,7 @@
 			return {
 				id: null,
 				section: {
-
+					name: null
 				}
 			};
 		},

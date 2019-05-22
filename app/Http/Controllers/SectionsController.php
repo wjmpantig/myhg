@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Section;
 use App\SectionAttendance;
+use App\SectionStudent;
 use App\StudentAttendance;
 use App\Season;
 use App\ScoreType;
@@ -13,9 +14,14 @@ use App\SectionScore;
 use App\User;
 use App\UserType;
 use Carbon\Carbon;
+use League\Csv\Reader;
+use League\Csv\Statement;
+use Faker\Factory;
 use Auth;
 use DB;
 use Log;
+use Hash;
+
 class SectionsController extends Controller
 {
     public function __construct()
@@ -230,6 +236,83 @@ class SectionsController extends Controller
         Log::info(sprintf("user %d added attendance %d for section %d",Auth::user()->id,$attendance->id,$attendance->section_id));
     
     	return $attendance;
+	}
+	
+	public function importFile(Request $request){
+		$request->validate([
+			'id'=>'exists:sections,id',
+			'file'=>'required|file|mimetypes:application/vnd.ms-excel,text/plain,text/csv,text/tsv'
+		]);
+		$id = $request->id;
+		$file = $request->file('file');
+		// return print_r($file->getPathName(),true);
+    	$student_type = UserType::where('name','Student')->first();
+
+		$result = $this->importUsersFromCSV($file->getPathName(),$student_type->id,$id);
+		return $result;
+	}
+
+	private function importUsersFromCSV($path,$user_type_id,$section_id=null){
+    	$csv = Reader::createFromPath($path,'r');
+		$csv->setHeaderOffset(0);
+		$stmt = new Statement();
+
+		$records = $stmt->process($csv);
+		$rows = 0;
+		$total = 0;
+		foreach($records as $offset => $record){
+			$rows++;
+			$validator = Validator::make($record,[
+	    		// 'email'=>'email|unique:users,email',
+	    		'first_name'=>'required',
+	    		'last_name'=>'required'
+	    	]);
+            // Log::debug($record);
+			// if($validator->fails()){
+			// 	// Log::debug($validator->errors());
+            //     if($validator->errors()->has('email')){
+            //         // Log::debug('generating fake email..');
+            //         // Log::debug("fake email generated: $email");
+            //     }else{
+				// 		continuess;
+				//     }
+				// }
+			$email = $this->generateRandomEmail($record['first_name'],$record['last_name'],Factory::create());
+			$record['email'] =  $email;
+			$user = new User();
+			$user->first_name = title_case($record['first_name']);
+			$user->last_name = title_case($record['last_name']);
+			$user->password = Hash::make(str_random(20));
+			$user->email = $record['email'];
+			$user->user_type_id = $user_type_id;
+			$user->save();
+            if($section_id){
+    			$section_student = new SectionStudent();
+    			$section_student->student_id = $user->id;
+    			$section_student->section_id = $section_id;
+    			$section_student->save();
+			}
+			$total++; 
+		}
+		return [
+			'total'=>$total,
+			'rows'=>$rows
+		];
+    }
+
+    private function generateRandomEmail($first_name,$last_name,$faker = null){
+        if (!$faker){
+            $faker = Factory::create();
+        }
+        do{
+            $email = sprintf("%s.%s%d@fakemail.com",str_slug($first_name),str_slug($last_name),$faker->randomNumber(2));
+            $user = User::where('email',$email)->first();
+            if($user){
+                continue;
+            }
+            break;
+        }while(true);
+        return $email;
     }
 
     

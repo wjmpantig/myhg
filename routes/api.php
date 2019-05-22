@@ -33,7 +33,7 @@ Route::middleware('auth:api')->group(function(){
 	Route::put('sections','SectionsController@create');
 	Route::post('sections/{id}','SectionsController@update');
 	Route::delete('sections/{id}','SectionsController@delete');
-
+	Route::post('sections/{id}/import','SectionsController@importFile');
 
 	Route::get('sections/{id}/students','SectionsController@students');
 	Route::get('sections/{id}/attendance','SectionsController@attendance');
