@@ -80,19 +80,19 @@
 		},
 		methods:{
 			hasError(field){
-				let error= this.errors;
-				if(error.errors &&  error.errors[field]){
+				let errors = this.errors;
+				if(errors && errors[field]){
 					return true;
 				}
 				return false;
 			},
 			getError(field){
-				let error= this.errors;
-				if(error.errors && error.errors[field]){
-					if(Array.isArray(error.errors[field]) && error.errors[field].length == 1){
-						return error.errors[field][0];
+				let errors= this.errors;
+				if(errors && errors[field]){
+					if(Array.isArray(errors[field]) && errors[field].length == 1){
+						return errors[field][0];
 					}
-					return error.errors[field];
+					return errors[field];
 				}
 				return null;
 			},
@@ -109,8 +109,9 @@
 				axios.post('api/users',data).then(response=>{
 					console.log(response.data);
 					//redirect
+					this.$router.push({path:"/admin/users/"});
 				}).catch(error=>{
-					this.errors = error.response.data;
+					this.errors = error.data.errors;
 				})
 			}
 		}

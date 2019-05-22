@@ -29,5 +29,5 @@ mix.js(	'resources/assets/js/admin_app.js','public/js')
 mix.sass('resources/assets/sass/app.scss', 'public/css')
 	.version()
 	.browserSync({
-		proxy: 'myhg.local'
+		proxy: 'localhost:8000'
 	});
