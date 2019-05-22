@@ -114,7 +114,7 @@ export default{
 				this.students = response.data.students;
 			}).catch(err=>{
 				if(err.response){
-					console.error(err.response.data.message);
+					console.error(err.data.message);
 				}else{
 					console.error(err);
 				}
@@ -136,7 +136,7 @@ export default{
 				dialog.close()
 			}).catch(err=>{
 				dialog.close();
-				let error = err.response.data;
+				let error = err.data;
 				console.error(error);
 				let message = error.message ? error.message : error;
 				this.$dialog.alert('Error: ' + message);
@@ -157,12 +157,8 @@ export default{
 				this.new_date.date = null;
 				this.loadAttendance();
 			}).catch(err=>{
-				if(err.response){
-					console.error(err.response.data.message);
-					this.new_date.errors = err.response.data.errors['date'];
-				}else{
-					console.error(err);
-				}
+				this.new_date.errors = err.data.errors['date'];
+				console.error(err);
 			});
 		}
 	},

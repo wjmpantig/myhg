@@ -122,7 +122,7 @@ export default{
 				console.log(response.data);
 				Vue.set(sections,index,response.data)
 			}).catch(err=>{
-				Vue.set(section,'errors',err.response.data);
+				Vue.set(section,'errors',err.data);
 			}).then(()=>{
 				Vue.set(section,'isUpdating', false);
 			})
@@ -143,7 +143,7 @@ export default{
 			}).catch(err=>{
 				console.error(err);
 				dialog.close();
-				let error = err.response.data;
+				let error = err.data;
 				let message = error.message ? error.message : error;
 				this.$dialog.alert('Error: ' + message);
 			})

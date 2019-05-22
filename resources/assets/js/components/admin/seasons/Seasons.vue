@@ -95,7 +95,7 @@ export default{
 				console.log(response.data);
 				Vue.set(seasons,index,response.data)
 			}).catch(err=>{
-				Vue.set(season,'errors',err.response.data);
+				Vue.set(season,'errors',err.data);
 			}).then(()=>{
 				Vue.set(season,'isUpdating', false);
 			})
@@ -116,7 +116,7 @@ export default{
 			}).catch(err=>{
 				console.error(err);
 				dialog.close();
-				let error = err.response.data;
+				let error = err.data;
 				let message = error.message ? error.message : error;
 				this.$dialog.alert('Error: ' + message);
 			})

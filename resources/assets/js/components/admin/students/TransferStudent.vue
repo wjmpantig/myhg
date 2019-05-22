@@ -302,7 +302,7 @@
 					});
 				}).catch(err=>{
 					dialog.close();
-					let error = err.response.data;
+					let error = err.data;
 					console.error(error);
 					let message = error.message ? error.message : error;
 					this.$dialog.alert('Error: ' + message);

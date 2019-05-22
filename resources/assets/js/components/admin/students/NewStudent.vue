@@ -116,7 +116,7 @@
 					this.clear();
 				}).catch(error=>{
 					console.error(error);
-					this.errors = error.response.data;
+					this.errors = error.data;
 				})
 				
 			},

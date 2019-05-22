@@ -75,7 +75,8 @@
 				this.type = this.types[0].id;
 				console.log(this.type)
 			}).catch(error=>{
-				console.error(error.response);
+				console.error(error.data);
+				
 			})
 		},
 		methods:{

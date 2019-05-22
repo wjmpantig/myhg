@@ -95,7 +95,7 @@
 					this[field] = response.data[field];
 				}).catch(err=>{
 					console.error(err)
-					this.errors = err.response.data;
+					this.errors = err.data;
 				});
 			}
 		}

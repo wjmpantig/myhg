@@ -97,8 +97,8 @@
 			axios.get('/api/score_types/' + this.$route.meta.type_id).then(response=>{
 				this.score_type = response.data;
 			}).catch(err=>{
-				if(err.response){
-					console.error(err.response.data.message);
+				if(err.data){
+					console.error(err.data.message);
 				}else{
 					console.error(err);
 				}
@@ -113,7 +113,7 @@
 					this.scores = response.data.scores;
 					this.students = response.data.students;
 				}).catch(err=>{
-					if(err.response){
+					if(err.data){
 						console.error(err.response.data.message);
 					}else{
 						console.error(err);
@@ -135,8 +135,8 @@
 					// Vue.set(this.errors,index,null);
 				}).catch(err=>{
 					
-					if(err.response){
-						console.error(err.response.data.message);
+					if(err.data	){
+						console.error(err.data.message);
 						Vue.set(this.errors.total,index,err.response.data.errors)
 
 					}else{
@@ -172,11 +172,11 @@
 					if(!this.errors.students[index]){
 						Vue.set(this.errors.students,index,{});
 					}
-					if(err.response){
-						console.error(err.response.data.message);
+					if(err.data){
+						console.error(err.data.message);
 						Vue.set(this.errors.students[index],score.id,{
 							date: score.date,
-							errors:err.response.data.errors
+							errors:err.data.errors
 						});
 						
 
@@ -229,8 +229,8 @@
 					this.loadScores();
 				}).catch(err=>{
 					if(err.response){
-						console.error(err.response.data.message);
-						this.new_date.errors = err.response.data.errors['date'];
+						console.error(err.data.message);
+						this.new_date.errors = err.data.errors['date'];
 					}else{
 						console.error(err);
 					}

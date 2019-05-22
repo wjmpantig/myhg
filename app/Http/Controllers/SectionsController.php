@@ -53,7 +53,17 @@ class SectionsController extends Controller
     public function update(Request $request){
     	$request->validate([
     		'id'=>'required|exists:sections,id',
-    		'name'=>'required|max:20'
+			'name'=>[
+				'required',
+				'max:20',
+				Rule::unique('sections')->where(function($query) use($request){
+					$s = Section::findOrFail($request->id);
+					return $query->where('id','<>',$request->id)
+						->where('season_id',$s->season_id)
+                        ->where('name',$request->name)
+                        ->whereNull('deleted_at');
+                }),
+			]
     	]);
     	$section = Section::findOrFail($request->id);
     	$section->name = $request->name;
