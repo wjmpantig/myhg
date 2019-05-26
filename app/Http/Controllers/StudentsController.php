@@ -60,7 +60,6 @@ class StudentsController extends Controller
     		->join('seasons','seasons.id','=','sections.season_id')
     		->where('student_id',$student->id)
             ->whereNull('section_students.deleted_at')
-            ->whereNull('users.deleted_at')
     		->get();
     	$student->sections = $sections;
     	return $student;
