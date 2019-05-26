@@ -28,7 +28,7 @@
 				<tr>
 					<th>Name</th>
 					<th>Section</th>
-					<th>Transfer</th>
+					<th>Action</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -36,9 +36,9 @@
 					<td><router-link :to="{path:'/students/'+ student.id}">{{student.name}}</router-link></td>
 					<td>{{student.section_name}}</td>
 					<td class="has-text-centered">
-						<router-link :to="{path:'/students/'+student.id+'/transfer'}" class="has-text-danger">
+						<!-- <router-link :to="{path:'/students/'+student.id+'/transfer'}" class="has-text-danger">
 							<font-awesome-icon :icon="['fas','file-export']"></font-awesome-icon>		
-						</router-link>	
+						</router-link>	 -->
 						
 					</td>
 				</tr>

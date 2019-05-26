@@ -14,7 +14,7 @@
 				<tr>
 					<th>Name</th>
 					
-					<th>Transfer</th>
+					<th>Action</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -22,9 +22,11 @@
 					<td>{{student.last_name}}, {{student.first_name}}</td>
 					<td class="has-text-centered">
 
-						<router-link :to="{path:'/students/'+student.student_id+'/transfer'}" class="has-text-danger">
+						<!-- <router-link :to="{path:'/students/'+student.student_id+'/transfer'}" class="has-text-danger">
 							<font-awesome-icon :icon="['fas','file-export']"></font-awesome-icon>		
-						</router-link>	
+						</router-link>	 -->
+							<font-awesome-icon :icon="['far','trash-alt']" class="has-text-danger" @click.prevent="confirmDelete(student,index)"></font-awesome-icon>		
+
 					</td>
 				</tr>
 			</tbody>
@@ -66,6 +68,26 @@
 					this.last_search = this.search;
 				}).catch(err=>{
 					console.error(err);
+				});
+			},
+			deleteStudent(student,i,dialog){
+				let students = this.students.data;
+				axios.delete(`/api/sections/${this.$route.params.id}/students/${student.id}`).then(res=>{
+					students.splice(i,1);
+					dialog.close();
+				}).catch(err=>{
+					console.error(err);
+					dialog.close();
+					let error = err.data;
+					let message = error.message ? error.message : error;
+					this.$dialog.alert('Error: ' + message);
+				})
+			},
+			confirmDelete(student,i){
+				this.$dialog.confirm(`Confirm delete student: ${student.last_name}, ${student.first_name}?`,{
+					loader:true
+				}).then((dialog)=>{
+					this.deleteStudent(student,i,dialog);
 				});
 			},
 			prev(){

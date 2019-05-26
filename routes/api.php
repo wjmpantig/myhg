@@ -23,7 +23,9 @@ Route::middleware('auth:api')->group(function(){
 	Route::put('seasons','SeasonsController@create');
 	Route::post('seasons/{id}','SeasonsController@update');
 	Route::delete('seasons/{id}','SeasonsController@delete');
+
 	Route::get('user_types','UserTypesController@all');
+	
 	Route::get('score_types/','ScoresController@score_types');
 	Route::get('score_types/{id}','ScoresController@score_types');
 
@@ -36,6 +38,7 @@ Route::middleware('auth:api')->group(function(){
 	Route::post('sections/{id}/import','SectionsController@importFile');
 
 	Route::get('sections/{id}/students','SectionsController@students');
+	Route::delete('sections/{id}/students/{section_student_id}','SectionsController@removeStudent');
 	Route::get('sections/{id}/attendance','SectionsController@attendance');
 	Route::post('sections/{id}/attendance','SectionsController@updateAttendance');
 	Route::put('sections/{id}/attendance','SectionsController@addAttendance');
@@ -52,6 +55,7 @@ Route::middleware('auth:api')->group(function(){
 	Route::post('students/add','StudentsController@create');
 	Route::get('students/{id}','StudentsController@get');
 	Route::post('students/{id}','StudentsController@update');
+	Route::delete('students/{id}','StudentsController@delete');
 	Route::get('students/{id}/attendance/{section_id}','StudentsController@attendance');
 	Route::get('students/{id}/scores/{section_id}','StudentsController@scores');
 	Route::post('students/{id}/transfer','StudentsController@transfer');

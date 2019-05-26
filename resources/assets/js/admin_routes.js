@@ -48,6 +48,13 @@ module.exports={
 				}
 			},
 			{
+				path:'midterms',
+				component: require('./components/admin/sections/Scores.vue'),
+				meta:{
+					type_id: 4
+				}
+			},
+			{
 				path:'import',
 				component: require('./components/admin/sections/Import.vue'),
 			}
