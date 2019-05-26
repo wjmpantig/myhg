@@ -112,7 +112,17 @@ class SectionsController extends Controller
         }
     	return $students->paginate(20);
     		
-    }
+	}
+	
+	public function removeStudent(Request $request){
+		$request->validate([
+			'id'=>'exists:sections,id',
+			'section_student_id'=>'exists:section_students,id',	
+		]);
+		$section_student = SectionStudent::findOrFail($request->section_student_id);
+		$section_student->delete();
+		return 'deleted';
+	}
 
     public function attendance(Request $request){
     	$request->validate([
