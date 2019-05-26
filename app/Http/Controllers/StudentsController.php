@@ -22,6 +22,11 @@ use Validator;
 use Faker\Factory;
 class StudentsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function all(Request $request){
     	// Log::debug($request->season_id);
     	$season = empty($request->season_id) ? Season::orderBy('created_at','desc')->first() : Season::findOrFail($request->season_id);
@@ -55,6 +60,7 @@ class StudentsController extends Controller
     		->join('seasons','seasons.id','=','sections.season_id')
     		->where('student_id',$student->id)
             ->whereNull('section_students.deleted_at')
+            ->whereNull('users.deleted_at')
     		->get();
     	$student->sections = $sections;
     	return $student;
@@ -84,6 +90,22 @@ class StudentsController extends Controller
         Log::info(sprintf("user %d created student %d in section %d",Auth::user()->id,$user->id,$request->section));
 
         return $user;
+    }
+
+    public function delete(Request $request){
+        $request->validate([
+            'id'=>[
+                Rule::exists('users')->where(function($query) use ($request){
+                	$student_type = UserType::where('name','Student')->first();
+
+                    return $query->where('id',$request->id)
+                    ->where('user_type_id',$student_type);
+                })
+            ]
+        ]);
+        $student = User::findOrFail($request->id);
+        $student->delete();
+        return 'deleted';
     }
 
     private function generateRandomEmail($first_name,$last_name,$faker = null){
