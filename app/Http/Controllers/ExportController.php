@@ -49,6 +49,7 @@ class ExportController extends Controller
     		'criteria.homework'=>'required|numeric|between:0,100',
     		'criteria.quiz'=>'required|numeric|between:0,100',
     		'criteria.final-exam'=>'required|numeric|between:0,100',
+    		'criteria.midterms'=>'required|numeric|between:0,100',
     		'criteria.teachers-grade'=>'required|numeric|between:0,100',
     		'criteria'=>[
     			function($attr,$val,$fail){
@@ -277,9 +278,9 @@ class ExportController extends Controller
     private function createSummarySheet($sheet,$section_id,$students,$criterias,$passing_grade,$pass_finals,$pass_finals_grade){
     	$row = 2;
     	$col = 1;
-    	$columns = ['Attendance','Homework','Quiz','Teacher\'s Grade','Final Exam','Final Grade','Remarks'];
+    	$columns = ['Attendance','Homework','Quiz','Midterms','Teacher\'s Grade','Final Exam','Final Grade','Remarks'];
     	if($pass_finals){
-    		array_splice($columns,5,0,['Passed Final Exam']);
+    		array_splice($columns,6,0,['Passed Final Exam']);
     	}
     	$passing_grade_cell = null;
     	$pass_final_cell = null;

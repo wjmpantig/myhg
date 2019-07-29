@@ -147,11 +147,12 @@
 		mounted(){
 			let criteria = {};
 			let slugify = this.slugify;
-			criteria[slugify('Attendance')]=14;
-			criteria[slugify('Homework')]=14;
-			criteria[slugify('Quiz')]=14;
-			criteria[slugify('Final Exam')]=50;
-			criteria[slugify('Teacher\'s Grade')]=8;
+			criteria[slugify('Attendance')] = 14;
+			criteria[slugify('Homework')] = 14;
+			criteria[slugify('Quiz')] = 14;
+			criteria[slugify('Midterms')] = 25;
+			criteria[slugify('Final Exam')] = 25;
+			criteria[slugify('Teacher\'s Grade')] = 8;
 			this.criteria = criteria;
 			axios.get('/api/seasons').then(response=>{
 					this.seasons = response.data;
